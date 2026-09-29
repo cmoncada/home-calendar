@@ -1,0 +1,10 @@
+packages:
+  - backend
+  - frontend
+
+minimumReleaseAgeExclude:
+  - mysql2@3.24.5
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp

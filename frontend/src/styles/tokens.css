@@ -1,0 +1,43 @@
+:root {
+  color-scheme: dark;
+  /* Paleta inspirada en Netflix: fondo casi negro y acento rojo */
+  --color-bg: #141414;
+  --color-bg-elevated: #1f1f1f;
+  --color-surface: #262626;
+  --color-surface-hover: #313131;
+  --color-border: #3a3a3a;
+  --color-text: #f5f5f5;
+  --color-text-muted: #a3a3a3;
+  --color-text-faint: #6d6d6d;
+  --color-accent: #e50914;
+  --color-accent-hover: #f6121d;
+  --color-accent-soft: rgba(229, 9, 20, 0.16);
+  --color-success: #2ecc71;
+  --color-danger: #ff5c5c;
+  --color-warning: #f5c518;
+  --color-overlay: rgba(0, 0, 0, 0.72);
+
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, system-ui, -apple-system, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: clamp(1.75rem, 4vw, 3.5rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.55);
+  --transition: 180ms ease;
+  --header-h: 64px;
+}
