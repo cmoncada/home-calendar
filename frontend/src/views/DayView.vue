@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useTasksStore } from '../stores/tasks.js';
+import { useAuthStore } from '../stores/auth.js';
 import { addDays, describeRecurrence, formatDuration, formatLong, formatShort, today } from '../utils/dates.js';
 import TaskFormModal from '../components/TaskFormModal.vue';
 import DeleteTaskDialog from '../components/DeleteTaskDialog.vue';
@@ -9,6 +10,7 @@ import DeleteTaskDialog from '../components/DeleteTaskDialog.vue';
 const props = defineProps({ date: { type: String, required: true } });
 
 const store = useTasksStore();
+const auth = useAuthStore();
 const router = useRouter();
 
 const day = computed(() => (props.date === 'today' || !/^\d{4}-\d{2}-\d{2}$/.test(props.date) ? today() : props.date));
@@ -127,7 +129,7 @@ onMounted(() => {
           </p>
         </div>
 
-        <div class="actions">
+        <div v-if="auth.canEditTask(o.task)" class="actions">
           <button class="btn btn-ghost" type="button" @click="editing = o">Editar</button>
           <button class="btn btn-ghost btn-icon" type="button" aria-label="Eliminar" title="Eliminar" @click="deleting = o">🗑</button>
         </div>

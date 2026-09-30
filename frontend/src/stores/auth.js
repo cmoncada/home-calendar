@@ -8,6 +8,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAdmin = computed(() => user.value?.role === 'admin');
 
+  /** Misma regla que el servidor: creador, responsable o administrador. */
+  function canEditTask(task) {
+    const me = user.value;
+    if (!me || !task) return false;
+    return me.role === 'admin' || task.createdBy === me.id || task.assignees.includes(me.id);
+  }
+
   async function fetchMe() {
     try {
       user.value = (await api.get('/auth/me')).user;
@@ -36,5 +43,5 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = next;
   }
 
-  return { user, checked, isAdmin, fetchMe, login, register, logout, setUser };
+  return { user, checked, isAdmin, canEditTask, fetchMe, login, register, logout, setUser };
 });
