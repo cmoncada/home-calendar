@@ -61,3 +61,19 @@ export function nowInZone(timeZone) {
   );
   return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}` };
 }
+
+export function startOfMonth(str) {
+  return `${str.slice(0, 7)}-01`;
+}
+
+export function endOfMonth(str) {
+  return `${str.slice(0, 7)}-${String(daysInMonth(str)).padStart(2, '0')}`;
+}
+
+export function startOfYear(str) {
+  return `${str.slice(0, 4)}-01-01`;
+}
+
+export function endOfYear(str) {
+  return `${str.slice(0, 4)}-12-31`;
+}

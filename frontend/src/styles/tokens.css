@@ -17,6 +17,11 @@
   --color-warning: #f5c518;
   --color-overlay: rgba(0, 0, 0, 0.72);
 
+  /* Gráficas del dashboard */
+  --chart-completed: #2ecc71;
+  --chart-unfinished: #ff5c5c;
+  --chart-pending: #6d6d6d;
+
   --font-sans: 'Helvetica Neue', Helvetica, Arial, system-ui, -apple-system, sans-serif;
   --fs-xs: 0.75rem;
   --fs-sm: 0.875rem;

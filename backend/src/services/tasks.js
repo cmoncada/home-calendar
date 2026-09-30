@@ -50,16 +50,17 @@ export async function getTask(id, viewerId) {
  * con la tarea, sus asignados y el estado de completado.
  * - viewerId: usuario que consulta; sin él (pantalla ESP32) se excluyen todas las tareas privadas.
  * - userId: si se indica, solo tareas asignadas a ese usuario.
+ * - includePrivate: incluye las privadas de todos (solo para estadísticas agregadas, nunca para mostrarlas).
  */
-export async function occurrencesInRange(from, to, { userId, viewerId = null } = {}) {
+export async function occurrencesInRange(from, to, { userId, viewerId = null, includePrivate = false } = {}) {
   // La duración máxima es 365 días, así que una tarea única que empezó hace más no puede solaparse.
   const tasks = await query(
     `SELECT * FROM tasks
       WHERE start_date <= ?
         AND (recurrence_type <> 'none' OR start_date >= ?)
         AND (recurrence_until IS NULL OR recurrence_until >= ?)
-        AND (is_private = 0 OR created_by = ?)`,
-    [to, addDays(from, -366), addDays(from, -366), viewerId],
+        AND (? OR is_private = 0 OR created_by = ?)`,
+    [to, addDays(from, -366), addDays(from, -366), includePrivate, viewerId],
   );
   if (!tasks.length) return [];
 

@@ -6,7 +6,11 @@ import { query } from '../db.js';
 import { HttpError } from '../middleware/errors.js';
 import { hashToken, requireAuth, requireRole } from '../middleware/auth.js';
 import { deleteUploadedAvatar, publicUser } from '../services/avatars.js';
-import { colorSchema, idParam, nameSchema, passwordSchema } from '../validation.js';
+import { colorSchema, dateSchema, idParam, nameSchema, passwordSchema } from '../validation.js';
+import { config } from '../config.js';
+import { endOfMonth, endOfYear, nowInZone, startOfMonth, startOfYear } from '../services/dates.js';
+import { occurrencesInRange } from '../services/tasks.js';
+import { computeStats } from '../services/stats.js';
 
 const router = Router();
 router.use('/admin', requireAuth, requireRole('admin'));
@@ -98,6 +102,58 @@ router.delete('/admin/users/:id', async (req, res) => {
   await query('DELETE FROM users WHERE id = ?', [user.id]);
   await deleteUploadedAvatar(user);
   res.status(204).end();
+});
+
+/**
+ * Estadísticas para el dashboard. Incluye las tareas privadas de todos en los
+ * números agregados, pero nunca devuelve títulos ni detalles de tareas.
+ * GET /api/admin/stats?period=year|month|day&date=YYYY-MM-DD&userId=
+ */
+router.get('/admin/stats', async (req, res) => {
+  const today = nowInZone(config.tz).date;
+  const params = z
+    .object({
+      period: z.enum(['year', 'month', 'day']).default('month'),
+      date: dateSchema.default(today),
+      userId: z.coerce.number().int().positive().optional(),
+    })
+    .parse(req.query);
+
+  const ranges = {
+    year: [startOfYear(params.date), endOfYear(params.date)],
+    month: [startOfMonth(params.date), endOfMonth(params.date)],
+    day: [params.date, params.date],
+  };
+  const [from, to] = ranges[params.period];
+
+  const [users, [first], occurrences] = await Promise.all([
+    query(
+      `SELECT id, name, role, avatar_type, avatar_value, color FROM users
+        WHERE role <> 'display' ORDER BY is_active DESC, name`,
+    ),
+    query('SELECT MIN(start_date) AS first FROM tasks'),
+    occurrencesInRange(from, to, { includePrivate: true }),
+  ]);
+
+  const stats = computeStats(occurrences, {
+    period: params.period,
+    from,
+    to,
+    today,
+    userId: params.userId ?? null,
+    users,
+  });
+
+  res.json({
+    period: params.period,
+    date: params.date,
+    from,
+    to,
+    today,
+    firstYear: Number((first?.first ?? today).slice(0, 4)),
+    users: users.map(publicUser),
+    ...stats,
+  });
 });
 
 router.get('/admin/display-tokens', async (req, res) => {

@@ -9,6 +9,7 @@ const router = createRouter({
     { path: '/', name: 'calendar', component: () => import('./views/CalendarView.vue') },
     { path: '/day/:date', name: 'day', component: () => import('./views/DayView.vue'), props: true },
     { path: '/profile', name: 'settings', component: () => import('./views/ProfileSettingsView.vue') },
+    { path: '/admin/dashboard', name: 'dashboard', component: () => import('./views/DashboardView.vue'), meta: { admin: true } },
     { path: '/admin', name: 'admin', component: () => import('./views/AdminView.vue'), meta: { admin: true } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

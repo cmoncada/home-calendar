@@ -26,7 +26,8 @@ async function logout() {
     <nav class="nav">
       <RouterLink to="/" class="nav-link">Calendario</RouterLink>
       <RouterLink :to="{ name: 'day', params: { date: 'today' } }" class="nav-link">Hoy</RouterLink>
-      <RouterLink v-if="auth.isAdmin" to="/admin" class="nav-link">Administrar</RouterLink>
+      <RouterLink v-if="auth.isAdmin" to="/admin/dashboard" class="nav-link desktop-only">Dashboard</RouterLink>
+      <RouterLink v-if="auth.isAdmin" to="/admin" class="nav-link desktop-only">Administrar</RouterLink>
     </nav>
 
     <div class="profile" @mouseleave="menuOpen = false">
@@ -37,6 +38,9 @@ async function logout() {
       <div v-if="menuOpen" class="menu" role="menu">
         <p class="menu-name">{{ auth.user.name }}</p>
         <RouterLink to="/profile" class="menu-item" role="menuitem" @click="menuOpen = false">Mi perfil</RouterLink>
+        <RouterLink v-if="auth.isAdmin" to="/admin/dashboard" class="menu-item" role="menuitem" @click="menuOpen = false">
+          Dashboard
+        </RouterLink>
         <RouterLink v-if="auth.isAdmin" to="/admin" class="menu-item" role="menuitem" @click="menuOpen = false">
           Administrar usuarios
         </RouterLink>
@@ -166,6 +170,10 @@ async function logout() {
   }
   .nav {
     gap: var(--space-3);
+  }
+  /* En móvil estas opciones siguen en el menú del perfil */
+  .desktop-only {
+    display: none;
   }
 }
 </style>

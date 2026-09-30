@@ -96,7 +96,10 @@ onMounted(() => load().catch((err) => (error.value = err.message)));
 
 <template>
   <main class="page admin">
-    <h1>Administración</h1>
+    <div class="page-head">
+      <h1>Administración</h1>
+      <RouterLink to="/admin/dashboard" class="btn btn-primary">📊 Ver dashboard</RouterLink>
+    </div>
 
     <p v-if="message" class="ok" role="status">{{ message }}</p>
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
@@ -260,6 +263,13 @@ onMounted(() => load().catch((err) => (error.value = err.message)));
 }
 h1 {
   font-size: var(--fs-xl);
+}
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
 }
 h2 {
   font-size: var(--fs-lg);
