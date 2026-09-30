@@ -108,6 +108,7 @@ function toggle(d) {
 }
 .segmented button {
   padding: var(--space-2) var(--space-4);
+  white-space: nowrap;
   border: 0;
   background: transparent;
   font-size: var(--fs-sm);
@@ -149,6 +150,22 @@ function toggle(d) {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: #fff;
+}
+@media (max-width: 560px) {
+  .segmented {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-self: stretch;
+  }
+  .segmented button + button {
+    border-left: 0;
+  }
+  .segmented button:nth-child(even) {
+    border-left: 1px solid var(--color-border);
+  }
+  .segmented button:nth-child(n + 3) {
+    border-top: 1px solid var(--color-border);
+  }
 }
 .monthly-hint {
   grid-column: 1 / -1;

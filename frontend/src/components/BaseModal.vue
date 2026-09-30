@@ -45,6 +45,8 @@ onBeforeUnmount(() => {
   inset: 0;
   z-index: 100;
   display: grid;
+  /* minmax(0, 1fr) permite que el modal se estreche por debajo del ancho mínimo de su contenido */
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding: var(--space-4);
   background: var(--color-overlay);
@@ -52,6 +54,7 @@ onBeforeUnmount(() => {
 }
 .modal {
   width: 100%;
+  min-width: 0;
   max-height: calc(100dvh - 2 * var(--space-4));
   display: flex;
   flex-direction: column;
@@ -86,6 +89,31 @@ onBeforeUnmount(() => {
   gap: var(--space-2);
   padding: var(--space-4) var(--space-5);
   border-top: 1px solid var(--color-border);
+}
+/* En móvil el modal ocupa toda la pantalla */
+@media (max-width: 560px) {
+  .backdrop {
+    padding: 0;
+  }
+  .modal {
+    max-width: none !important;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+  .modal-body {
+    flex: 1;
+  }
+  .modal-footer {
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  }
 }
 @keyframes fade-in {
   from {
