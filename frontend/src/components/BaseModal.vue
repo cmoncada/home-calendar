@@ -1,3 +1,9 @@
+<script>
+// Pila compartida por todos los modales: Escape solo cierra el de arriba y el scroll
+// de la página se bloquea mientras quede alguno abierto.
+const stack = [];
+</script>
+
 <script setup>
 import { onBeforeUnmount, onMounted } from 'vue';
 
@@ -8,15 +14,17 @@ defineProps({
 const emit = defineEmits(['close']);
 
 function onKey(e) {
-  if (e.key === 'Escape') emit('close');
+  if (e.key === 'Escape' && stack.at(-1) === onKey) emit('close');
 }
 onMounted(() => {
+  stack.push(onKey);
   document.addEventListener('keydown', onKey);
   document.body.style.overflow = 'hidden';
 });
 onBeforeUnmount(() => {
+  stack.splice(stack.indexOf(onKey), 1);
   document.removeEventListener('keydown', onKey);
-  document.body.style.overflow = '';
+  if (!stack.length) document.body.style.overflow = '';
 });
 </script>
 

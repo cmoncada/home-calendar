@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useTasksStore } from '../stores/tasks.js';
 import { addDays, describeRecurrence, formatDuration, formatLong, formatShort, today } from '../utils/dates.js';
 import TaskFormModal from '../components/TaskFormModal.vue';
+import DeleteTaskDialog from '../components/DeleteTaskDialog.vue';
 
 const props = defineProps({ date: { type: String, required: true } });
 
@@ -16,6 +17,7 @@ const done = computed(() => items.value.filter((o) => o.completed).length);
 const progress = computed(() => (items.value.length ? Math.round((done.value / items.value.length) * 100) : 0));
 
 const editing = ref(null);
+const deleting = ref(null);
 const creating = ref(false);
 const error = ref('');
 
@@ -54,16 +56,6 @@ async function toggle(o) {
   }
 }
 
-async function removeOccurrence(o) {
-  const recurring = o.task.recurrenceType !== 'none';
-  const msg = recurring ? '¿Eliminar solo esta repetición de la tarea?' : '¿Eliminar esta tarea?';
-  if (!confirm(msg)) return;
-  try {
-    await store.removeOccurrence(o.taskId, o.date);
-  } catch (err) {
-    error.value = err.message;
-  }
-}
 
 watch(day, load);
 onMounted(() => {
@@ -133,8 +125,8 @@ onMounted(() => {
         </div>
 
         <div class="actions">
-          <button class="btn btn-ghost" type="button" @click="editing = o.task">Editar</button>
-          <button class="btn btn-ghost btn-icon" type="button" aria-label="Eliminar" title="Eliminar" @click="removeOccurrence(o)">🗑</button>
+          <button class="btn btn-ghost" type="button" @click="editing = o">Editar</button>
+          <button class="btn btn-ghost btn-icon" type="button" aria-label="Eliminar" title="Eliminar" @click="deleting = o">🗑</button>
         </div>
       </li>
     </ul>
@@ -145,7 +137,8 @@ onMounted(() => {
     </div>
 
     <TaskFormModal v-if="creating" :default-date="day" @close="creating = false" />
-    <TaskFormModal v-if="editing" :task="editing" @close="editing = null" />
+    <TaskFormModal v-if="editing" :task="editing.task" :occurrence-date="editing.date" @close="editing = null" />
+    <DeleteTaskDialog v-if="deleting" :task="deleting.task" :date="deleting.date" @close="deleting = null" />
   </main>
 </template>
 

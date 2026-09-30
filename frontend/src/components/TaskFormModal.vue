@@ -5,11 +5,14 @@ import { useAuthStore } from '../stores/auth.js';
 import { today } from '../utils/dates.js';
 import BaseModal from './BaseModal.vue';
 import RecurrencePicker from './RecurrencePicker.vue';
+import DeleteTaskDialog from './DeleteTaskDialog.vue';
 
 const props = defineProps({
   /** Tarea a editar (null = nueva) */
   task: { type: Object, default: null },
   defaultDate: { type: String, default: '' },
+  /** Repetición desde la que se abrió la edición (permite borrar solo esa) */
+  occurrenceDate: { type: String, default: null },
 });
 const emit = defineEmits(['close', 'saved']);
 
@@ -39,6 +42,7 @@ const form = reactive({
 
 const error = ref('');
 const saving = ref(false);
+const confirmingDelete = ref(false);
 const isEdit = computed(() => Boolean(props.task));
 const maxDuration = computed(() => (form.durationUnit === 'hours' ? 168 : 365));
 
@@ -91,20 +95,6 @@ async function submit() {
   }
 }
 
-async function removeTask() {
-  const msg = props.task.recurrenceType === 'none'
-    ? '¿Eliminar esta tarea?'
-    : '¿Eliminar la tarea y TODAS sus repeticiones?';
-  if (!confirm(msg)) return;
-  saving.value = true;
-  try {
-    await store.remove(props.task.id);
-    emit('close');
-  } catch (err) {
-    error.value = err.message;
-    saving.value = false;
-  }
-}
 </script>
 
 <template>
@@ -218,13 +208,20 @@ async function removeTask() {
     </form>
 
     <template #footer>
-      <button v-if="isEdit" class="btn btn-danger delete" type="button" :disabled="saving" @click="removeTask">Eliminar</button>
+      <button v-if="isEdit" class="btn btn-danger delete" type="button" :disabled="saving" @click="confirmingDelete = true">Eliminar</button>
       <button class="btn btn-ghost" type="button" @click="emit('close')">Cancelar</button>
       <button class="btn btn-primary" type="submit" form="task-form" :disabled="saving">
         {{ saving ? 'Guardando…' : 'Guardar' }}
       </button>
     </template>
   </BaseModal>
+  <DeleteTaskDialog
+    v-if="confirmingDelete"
+    :task="task"
+    :date="occurrenceDate"
+    @close="confirmingDelete = false"
+    @deleted="emit('close')"
+  />
 </template>
 
 <style scoped>
