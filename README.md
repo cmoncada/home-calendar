@@ -91,54 +91,35 @@ Tras `db:reset`, la contraseña de Admin vuelve a ser la de `ADMIN_PASSWORD` y l
 
 ## Producción en Proxmox
 
-### Recursos recomendados para la VM
+📘 **Guía completa paso a paso: [docs/despliegue-proxmox.md](docs/despliegue-proxmox.md)**. Incluye crear la VM, preparar Debian, backups, HTTPS y solución de problemas.
 
-| Recurso | Mínimo | Recomendado |
+| Recurso de la VM | Mínimo | Recomendado |
 |---|---|---|
-| vCPU | 1 | **2** |
-| RAM | 1.5 GB | **2 GB** |
+| vCPU (**tipo `host`**) | 1 | **2** |
+| RAM (sin ballooning) | 1.5 GB | **2 GB** |
 | Disco | 10 GB | **20 GB** |
 
-En la prueba local del stack de producción, el consumo en reposo fue de ~200 MB (MySQL ~150 MB, Node ~40 MB, Nginx ~10 MB). Los límites de memoria de `docker-compose.prod.yml` son 640 MB para MySQL, 256 MB para el backend y 64 MB para Nginx. Con 2 GB queda margen para Debian, para compilar las imágenes (`docker build` es lo que más CPU/RAM consume) y para los backups.
+> ⚠️ MySQL 8.4 necesita una CPU **x86-64-v2**: en Proxmox usa el tipo de CPU `host` (o `x86-64-v2-AES`), no `kvm64`.
 
-Ajustes de la VM en Proxmox: tipo de CPU `host`, disco **VirtIO SCSI** (con `discard` si está sobre SSD/thin), red **VirtIO**, *ballooning* desactivado (MySQL no lleva bien que le quiten RAM) y *QEMU Guest Agent* activado.
+Resumen, en la VM (con Docker instalado y el proyecto en `/opt/home-calendar`):
 
-### Pasos
+```bash
+./scripts/setup-env.sh
+```
 
-1. Crea una VM con **Debian 12/13** (instalación mínima + SSH).
-2. Instala Docker:
-   ```bash
-   curl -fsSL https://get.docker.com | sh
-   ```
-   ```bash
-   sudo usermod -aG docker $USER
-   ```
-3. Copia el proyecto a la VM (por ejemplo en `/opt/home-calendar`) con `git clone` o `rsync`.
-4. Configura los secretos:
-   ```bash
-   cp .env.prod.example .env.prod
-   ```
-   Edita `.env.prod` y cambia **todas** las contraseñas. Genera el `JWT_SECRET` con `openssl rand -hex 48`. Ajusta `APP_TZ` a tu zona horaria.
-5. Despliega:
-   ```bash
-   ./scripts/deploy.sh
-   ```
-   La app queda en `http://IP-DE-LA-VM` (puerto configurable con `HTTP_PORT`).
-6. Backups diarios (MySQL + fotos, se conservan 14 días en `./backups`):
-   ```bash
-   crontab -e
-   ```
-   ```
-   0 3 * * * /opt/home-calendar/scripts/backup-db.sh >> /var/log/home-calendar-backup.log 2>&1
-   ```
-   Restaurar un backup:
-   ```bash
-   gunzip -c backups/db-FECHA.sql.gz | docker compose -f docker-compose.prod.yml --env-file .env.prod exec -T db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
-   ```
+```bash
+./scripts/deploy.sh
+```
 
-**HTTPS / acceso desde fuera de casa:** pon delante un reverse proxy con TLS (Nginx Proxy Manager, Caddy o Traefik, o un túnel como Tailscale/Cloudflare Tunnel) y luego cambia `COOKIE_SECURE=true` en `.env.prod`. Dentro de la LAN funciona tal cual por HTTP.
+| Script | Qué hace |
+|---|---|
+| `scripts/setup-env.sh` | Crea `.env.prod` con secretos aleatorios |
+| `scripts/check-host.sh` | Comprueba CPU, RAM, disco, Docker, `.env.prod` y puerto (lo usa `deploy.sh`) |
+| `scripts/deploy.sh` | Instala o actualiza: `git pull` si hay remoto, build, arranque y espera a que todo esté sano |
+| `scripts/backup-db.sh` | Backup de la BD y las fotos en `./backups` (conserva 14 días) |
+| `scripts/restore-db.sh` | Restaura un backup |
 
-**Actualizar:** `./scripts/deploy.sh` (hace `git pull`, reconstruye y reinicia). Las migraciones de base de datos (`backend/migrations/*.sql`) se aplican solas al arrancar.
+En producción la API no arranca si `.env.prod` tiene secretos de ejemplo, un `JWT_SECRET` corto o una zona horaria inválida.
 
 ## ESP32
 

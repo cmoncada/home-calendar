@@ -22,7 +22,7 @@ services:
       - db_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqladmin ping -h 127.0.0.1 -u root --silent"]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -51,6 +51,7 @@ services:
       DISPLAY_NAME: ${DISPLAY_NAME:-Pantalla}
       ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-true}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
     volumes:
       - uploads:/data/uploads
     depends_on:

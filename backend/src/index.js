@@ -15,7 +15,7 @@ import displayRoutes from './routes/display.js';
 
 const app = express();
 app.disable('x-powered-by');
-app.set('trust proxy', 1);
+app.set('trust proxy', config.trustProxy);
 app.use(
   helmet({
     contentSecurityPolicy: false, // la API solo devuelve JSON e imágenes; el HTML lo sirve Nginx/Vite

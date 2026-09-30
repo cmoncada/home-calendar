@@ -19,7 +19,7 @@ services:
       - db_dev:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_dev_pass}"]
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqladmin ping -h 127.0.0.1 -u root --silent"]
       interval: 5s
       timeout: 5s
       retries: 30
