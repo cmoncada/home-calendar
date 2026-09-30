@@ -59,7 +59,7 @@ async function login(password) {
     <div class="brand">HOME<span>calendar</span></div>
 
     <section class="who">
-      <h1>{{ manageMode ? 'Administrar perfiles' : '¿Quién va a organizar hoy?' }}</h1>
+      <h1>{{ manageMode ? 'Administrar perfiles' : 'Crea tus tareas' }}</h1>
       <p v-if="manageMode" class="muted">Entra con un perfil administrador</p>
 
       <p v-if="loadError" class="form-error">No se pudo conectar con el servidor: {{ loadError }}</p>
