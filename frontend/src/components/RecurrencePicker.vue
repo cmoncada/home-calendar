@@ -3,11 +3,15 @@ import { WEEKDAY_NAMES, WEEKDAYS_SHORT, WEEK_ORDER } from '../utils/dates.js';
 
 const type = defineModel('type', { type: String, default: 'none' });
 const days = defineModel('days', { type: Array, default: () => [] });
+const interval = defineModel('interval', { type: Number, default: 15 });
+
+const QUICK_INTERVALS = [7, 15, 30];
 
 const TYPES = [
   { value: 'none', label: 'No se repite' },
   { value: 'weekly', label: 'Semanal' },
   { value: 'monthly', label: 'Mensual' },
+  { value: 'interval', label: 'Cada N días' },
 ];
 
 function setType(value) {
@@ -64,6 +68,27 @@ function toggle(d) {
         {{ d }}
       </button>
       <p class="hint monthly-hint">Si el mes no tiene ese día (p. ej. 31), se usa el último día del mes.</p>
+    </div>
+
+    <div v-else-if="type === 'interval'" class="interval">
+      <label class="every">
+        Cada
+        <input v-model.number="interval" class="input num" type="number" min="1" max="365" required />
+        días
+      </label>
+      <div class="quick">
+        <button
+          v-for="n in QUICK_INTERVALS"
+          :key="n"
+          type="button"
+          class="day"
+          :class="{ active: interval === n }"
+          @click="interval = n"
+        >
+          {{ n }} días
+        </button>
+      </div>
+      <p class="hint">Se cuenta desde la fecha de inicio de la tarea.</p>
     </div>
   </div>
 </template>
@@ -127,5 +152,26 @@ function toggle(d) {
 }
 .monthly-hint {
   grid-column: 1 / -1;
+}
+.interval {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.every {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+}
+.every .num {
+  width: 90px;
+}
+.quick {
+  display: flex;
+  gap: var(--space-2);
+}
+.quick .day {
+  padding: 0 var(--space-3);
 }
 </style>

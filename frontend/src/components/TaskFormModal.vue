@@ -30,6 +30,7 @@ const form = reactive({
   durationUnit: t?.durationUnit ?? 'hours',
   recurrenceType: t?.recurrenceType ?? 'none',
   recurrenceDays: [...(t?.recurrenceDays ?? [])],
+  recurrenceInterval: t?.recurrenceInterval ?? 15,
   hasUntil: Boolean(t?.recurrenceUntil),
   recurrenceUntil: t?.recurrenceUntil ?? '',
   assignees: [...(t?.assignees ?? [auth.user.id])],
@@ -55,6 +56,7 @@ function payload() {
     durationUnit: form.durationUnit,
     recurrenceType: form.recurrenceType,
     recurrenceDays: form.recurrenceDays,
+    recurrenceInterval: form.recurrenceType === 'interval' ? Number(form.recurrenceInterval) : null,
     recurrenceUntil: form.recurrenceType !== 'none' && form.hasUntil ? form.recurrenceUntil || null : null,
     assignees: form.assignees,
   };
@@ -62,7 +64,7 @@ function payload() {
 
 async function submit() {
   error.value = '';
-  if (form.recurrenceType !== 'none' && !form.recurrenceDays.length) {
+  if (['weekly', 'monthly'].includes(form.recurrenceType) && !form.recurrenceDays.length) {
     error.value = form.recurrenceType === 'weekly' ? 'Elige al menos un día de la semana' : 'Elige al menos un día del mes';
     return;
   }
@@ -130,7 +132,11 @@ async function removeTask() {
 
       <div class="field">
         <span>Repetición</span>
-        <RecurrencePicker v-model:type="form.recurrenceType" v-model:days="form.recurrenceDays" />
+        <RecurrencePicker
+          v-model:type="form.recurrenceType"
+          v-model:days="form.recurrenceDays"
+          v-model:interval="form.recurrenceInterval"
+        />
         <div v-if="form.recurrenceType !== 'none'" class="until">
           <label class="check">
             <input v-model="form.hasUntil" type="checkbox" />

@@ -23,6 +23,7 @@ export function serializeTask(task, assigneeIds = []) {
     durationUnit: task.duration_unit,
     recurrenceType: task.recurrence_type,
     recurrenceDays: task.recurrence_days ?? [],
+    recurrenceInterval: task.recurrence_interval,
     recurrenceUntil: task.recurrence_until,
     assignees: assigneeIds,
     createdBy: task.created_by,

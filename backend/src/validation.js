@@ -31,8 +31,9 @@ export const taskSchema = z
     startTime: timeSchema.nullish().transform((v) => v || null),
     durationValue: z.coerce.number().int().min(1, 'La duración mínima es 1'),
     durationUnit: z.enum(['hours', 'days']),
-    recurrenceType: z.enum(['none', 'weekly', 'monthly']).default('none'),
+    recurrenceType: z.enum(['none', 'weekly', 'monthly', 'interval']).default('none'),
     recurrenceDays: z.array(z.number().int()).default([]),
+    recurrenceInterval: z.coerce.number().int().min(1, 'El intervalo mínimo es 1 día').max(365, 'El intervalo máximo es 365 días').nullish(),
     recurrenceUntil: dateSchema.nullish().transform((v) => v || null),
     assignees: z.array(z.number().int().positive()).default([]),
   })
@@ -47,13 +48,19 @@ export const taskSchema = z
     if (t.recurrenceType === 'monthly' && (!t.recurrenceDays.length || t.recurrenceDays.some((d) => d < 1 || d > 31))) {
       ctx.addIssue({ code: 'custom', path: ['recurrenceDays'], message: 'Elige al menos un día del mes' });
     }
+    if (t.recurrenceType === 'interval' && !t.recurrenceInterval) {
+      ctx.addIssue({ code: 'custom', path: ['recurrenceInterval'], message: 'Indica cada cuántos días se repite' });
+    }
     if (t.recurrenceUntil && t.recurrenceUntil < t.startDate) {
       ctx.addIssue({ code: 'custom', path: ['recurrenceUntil'], message: 'La fecha fin debe ser posterior al inicio' });
     }
   })
   .transform((t) => ({
     ...t,
-    recurrenceDays: t.recurrenceType === 'none' ? [] : [...new Set(t.recurrenceDays)].sort((a, b) => a - b),
+    recurrenceDays: ['weekly', 'monthly'].includes(t.recurrenceType)
+      ? [...new Set(t.recurrenceDays)].sort((a, b) => a - b)
+      : [],
+    recurrenceInterval: t.recurrenceType === 'interval' ? t.recurrenceInterval : null,
     recurrenceUntil: t.recurrenceType === 'none' ? null : t.recurrenceUntil,
   }));
 

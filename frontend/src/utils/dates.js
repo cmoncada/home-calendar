@@ -80,6 +80,9 @@ export function describeRecurrence(task) {
     const names = WEEK_ORDER.filter((d) => task.recurrenceDays.includes(d)).map((d) => WEEKDAY_NAMES[d].slice(0, 3));
     return `Cada semana: ${names.join(', ')}`;
   }
+  if (task.recurrenceType === 'interval') {
+    return task.recurrenceInterval === 1 ? 'Cada día' : `Cada ${task.recurrenceInterval} días`;
+  }
   if (task.recurrenceType === 'monthly') {
     return `Cada mes, día ${task.recurrenceDays.join(', ')}`;
   }

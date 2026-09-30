@@ -31,6 +31,8 @@ function isStartDay(task, date) {
       const last = daysInMonth(date);
       return day === last && task.recurrence_days.some((d) => d > last);
     }
+    case 'interval':
+      return date >= task.start_date && diffDays(task.start_date, date) % task.recurrence_interval === 0;
     default:
       return date === task.start_date;
   }
@@ -45,7 +47,10 @@ export function expandOccurrences(task, from, to, exceptions = new Set()) {
   if (diffDays(from, to) > MAX_RANGE_DAYS) throw new RangeError('Rango de fechas demasiado grande');
 
   const span = spanDays(task);
-  const recurring = task.recurrence_type !== 'none' && task.recurrence_days?.length > 0;
+  const recurring =
+    task.recurrence_type === 'interval'
+      ? task.recurrence_interval >= 1
+      : task.recurrence_type !== 'none' && task.recurrence_days?.length > 0;
   const effective = recurring ? task : { ...task, recurrence_type: 'none' };
 
   let first = maxDate(task.start_date, addDays(from, -(span - 1)));

@@ -12,7 +12,7 @@ Calendario para organizar las tareas diarias del hogar.
 - **Login estilo Netflix:** pantalla "¿Quién va a organizar hoy?" con los perfiles; al elegir uno se pide su contraseña.
 - **Perfiles:** nombre, contraseña de **mínimo 8 caracteres** y avatar (12 avatares incluidos o una foto propia, que se recorta a 256 px WebP). Se crean desde el tile "＋ Añadir perfil".
 - **Tareas:** nombre, fecha, hora opcional ("todo el día"), duración en **horas o días**, color, notas y responsables (uno o varios miembros).
-- **Recurrencia:** semanal (varios días de la semana) o mensual (varios días del mes; el 31 cae en el último día de los meses cortos), con fecha fin opcional. Se puede borrar una sola repetición.
+- **Recurrencia:** semanal (varios días de la semana), mensual (varios días del mes; el 31 cae en el último día de los meses cortos) o **cada N días** (p. ej. cada 15 días, contando desde la fecha de inicio), con fecha fin opcional. Se puede borrar una sola repetición.
 - **Completar:** cada repetición se marca como hecha por separado y se guarda quién la completó.
 - **Vistas:** mes, semana y día (con barra de progreso). Filtro "Solo mis tareas".
 - **Superusuario (admin):** crea, desactiva o elimina usuarios, cambia roles, restablece contraseñas y gestiona los tokens del ESP32. Siempre queda al menos un administrador.
@@ -54,6 +54,37 @@ pnpm build
 ```
 
 Para borrar la base de datos de desarrollo: `docker compose -f docker-compose.dev.yml down -v`.
+
+## Limpiar la base de datos
+
+Hay dos comandos. Los dos piden confirmación (escribir `si`). Añade `--yes` para saltarla.
+
+| Comando | Qué hace |
+|---|---|
+| `pnpm db:clean` | Borra **todas las tareas**, completados y repeticiones eliminadas. Mantiene usuarios, fotos y tokens del ESP32. |
+| `pnpm db:reset` | Borra **todo** (tablas y fotos de perfil) y vuelve a crear solo Admin y Pantalla, como recién instalada. |
+
+En desarrollo se ejecutan dentro del contenedor `backend` (tiene que estar arrancado):
+
+```bash
+pnpm db:clean
+```
+
+```bash
+pnpm db:reset
+```
+
+En producción (haz antes un backup con `./scripts/backup-db.sh`):
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec backend node src/scripts/db-clean.js tasks
+```
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec backend node src/scripts/db-clean.js all
+```
+
+Tras `db:reset`, la contraseña de Admin vuelve a ser la de `ADMIN_PASSWORD` y los tokens del ESP32 dejan de valer (hay que generar uno nuevo).
 
 ## Producción en Proxmox
 
@@ -164,6 +195,7 @@ void fetchToday() {
 backend/            API Express
   src/routes/       auth, users, tasks (+ calendario), admin, display (ESP32)
   src/services/     recurrence.js (cálculo de repeticiones), tasks.js, avatars.js
+  src/scripts/      db-clean.js (limpiar / resetear la BD)
   migrations/       SQL que se aplica al arrancar
   public/avatars/   avatares predefinidos
   tests/            node:test

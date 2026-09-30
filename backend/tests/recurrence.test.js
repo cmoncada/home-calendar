@@ -72,3 +72,27 @@ test('excepciones eliminan ocurrencias concretas', () => {
   const occ = expandOccurrences(task, '2026-09-01', '2026-09-30', new Set(['2026-09-08']));
   assert.deepEqual(dates(occ), ['2026-09-01', '2026-09-15', '2026-09-22', '2026-09-29']);
 });
+
+test('cada 15 días desde la fecha de inicio', () => {
+  const task = { ...base, recurrence_type: 'interval', recurrence_interval: 15 };
+  assert.deepEqual(dates(expandOccurrences(task, '2026-08-01', '2026-10-31')), [
+    '2026-09-01',
+    '2026-09-16',
+    '2026-10-01',
+    '2026-10-16',
+    '2026-10-31',
+  ]);
+});
+
+test('intervalo respeta la fecha fin y rangos a mitad de ciclo', () => {
+  const task = { ...base, recurrence_type: 'interval', recurrence_interval: 15, recurrence_until: '2026-10-10' };
+  assert.deepEqual(dates(expandOccurrences(task, '2026-09-20', '2026-12-31')), ['2026-10-01']);
+});
+
+test('intervalo con tarea de varios días se solapa con el rango', () => {
+  const task = { ...base, recurrence_type: 'interval', recurrence_interval: 10, duration_value: 2, duration_unit: 'days' };
+  const occ = expandOccurrences(task, '2026-09-12', '2026-09-12');
+  assert.equal(occ.length, 1);
+  assert.equal(occ[0].date, '2026-09-11');
+  assert.equal(occ[0].endDate, '2026-09-12');
+});

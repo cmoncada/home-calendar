@@ -19,7 +19,8 @@ function toRow(data) {
     duration_value: data.durationValue,
     duration_unit: data.durationUnit,
     recurrence_type: data.recurrenceType,
-    recurrence_days: data.recurrenceType === 'none' ? null : JSON.stringify(data.recurrenceDays),
+    recurrence_days: data.recurrenceDays.length ? JSON.stringify(data.recurrenceDays) : null,
+    recurrence_interval: data.recurrenceInterval,
     recurrence_until: data.recurrenceUntil,
   };
 }
@@ -64,6 +65,7 @@ async function loadOccurrence(req) {
     duration_unit: task.durationUnit,
     recurrence_type: task.recurrenceType,
     recurrence_days: task.recurrenceDays,
+    recurrence_interval: task.recurrenceInterval,
     recurrence_until: task.recurrenceUntil,
   };
   const exists = expandOccurrences(row, date, date).some((o) => o.date === date);

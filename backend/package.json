@@ -10,7 +10,9 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "test": "node --test \"tests/**/*.test.js\""
+    "test": "node --test \"tests/**/*.test.js\"",
+    "db:clean": "node src/scripts/db-clean.js tasks",
+    "db:reset": "node src/scripts/db-clean.js all"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
