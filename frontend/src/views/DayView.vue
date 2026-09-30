@@ -75,6 +75,7 @@ onMounted(() => {
 
 <template>
   <main class="page day">
+    <RouterLink :to="{ name: 'calendar', query: { date: day } }" class="btn btn-ghost back">← Volver al calendario</RouterLink>
     <div class="head">
       <div class="nav">
         <button class="btn btn-ghost btn-icon" type="button" aria-label="Día anterior" @click="go(-1)">‹</button>
@@ -149,6 +150,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.back {
+  margin-bottom: var(--space-4);
+}
 .head {
   display: flex;
   flex-wrap: wrap;

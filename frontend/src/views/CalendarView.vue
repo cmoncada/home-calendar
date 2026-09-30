@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useTasksStore } from '../stores/tasks.js';
 import {
   addDays,
@@ -17,6 +17,7 @@ import TaskFormModal from '../components/TaskFormModal.vue';
 
 const store = useTasksStore();
 const router = useRouter();
+const route = useRoute();
 
 function readPref(key, fallback) {
   try {
@@ -34,7 +35,8 @@ function writePref(key, value) {
 }
 
 const mode = ref(readPref('hc.view', window.innerWidth < 720 ? 'week' : 'month'));
-const cursor = ref(today());
+// ?date=YYYY-MM-DD abre el calendario en esa fecha (p. ej. al volver desde la vista de día)
+const cursor = ref(/^\d{4}-\d{2}-\d{2}$/.test(route.query.date ?? '') ? route.query.date : today());
 const showForm = ref(false);
 const formDate = ref(today());
 const error = ref('');
