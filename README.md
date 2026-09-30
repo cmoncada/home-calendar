@@ -18,7 +18,7 @@ Calendario para organizar las tareas diarias del hogar.
 - **Completar:** cada repetición se marca como hecha por separado y se guarda quién la completó.
 - **Vistas:** mes, semana y día (con barra de progreso). Filtro "Solo mis tareas".
 - **Superusuario (admin):** crea, desactiva o elimina usuarios, cambia roles, restablece contraseñas y gestiona los tokens del ESP32. Siempre queda al menos un administrador.
-- **Tema claro / oscuro:** se cambia desde el menú del perfil (☀️ / 🌙) y se recuerda en cada navegador. Todos los colores están en `frontend/src/styles/tokens.css`.
+- **Tema claro / oscuro:** se cambia desde el menú del perfil o con el botón de la pantalla de login (☀️ / 🌙) y se recuerda en cada navegador. Todos los colores están en `frontend/src/styles/tokens.css`.
 - **Dashboard (admin):** en `/admin/dashboard`, gráfica de barras apiladas (SVG propio, sin librerías) con tareas generadas, completadas, sin terminar (días pasados no marcados) y pendientes, más % de cumplimiento y desglose por usuario. Se filtra por año, mes o día y por usuario; haciendo clic en una barra se baja de año a mes y de mes a día. Las tareas privadas cuentan en los números pero nunca se muestran sus datos.
 - **Usuario "Pantalla" (ESP32):** no aparece en el login y solo entra con un token de API.
 

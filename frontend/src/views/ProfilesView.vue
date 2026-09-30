@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client.js';
 import { useAuthStore } from '../stores/auth.js';
 import PasswordModal from '../components/PasswordModal.vue';
+import ThemeToggle from '../components/ThemeToggle.vue';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -56,7 +57,10 @@ async function login(password) {
 
 <template>
   <main class="profiles">
-    <div class="brand">HOME<span>calendar</span></div>
+    <header class="top">
+      <div class="brand">HOME<span>calendar</span></div>
+      <ThemeToggle />
+    </header>
 
     <section class="who">
       <h1>{{ manageMode ? 'Administrar perfiles' : 'Crea tus tareas' }}</h1>
@@ -106,8 +110,18 @@ async function login(password) {
   flex-direction: column;
   background: var(--color-profiles-bg);
 }
-.brand {
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: var(--space-5) var(--space-6);
+}
+@media (max-width: 600px) {
+  .top {
+    padding: var(--space-4);
+  }
+}
+.brand {
   color: var(--color-accent);
   font-weight: 900;
   font-size: 2rem;
