@@ -5,14 +5,22 @@ import { api } from '../api/client.js';
 export const useTasksStore = defineStore('tasks', () => {
   const occurrences = ref([]);
   const members = ref([]);
+  const categories = ref([]);
+  /** null = todas las categorías */
+  const categoryFilter = ref(null);
   const loading = ref(false);
   const onlyMine = ref(false);
   let lastRange = null;
 
   const membersById = computed(() => new Map(members.value.map((m) => [m.id, m])));
+  const categoriesById = computed(() => new Map(categories.value.map((c) => [c.id, c])));
 
   async function loadMembers() {
     members.value = (await api.get('/users')).users;
+  }
+
+  async function loadCategories() {
+    if (!categories.value.length) categories.value = (await api.get('/categories')).categories;
   }
 
   async function load(from, to) {
@@ -32,7 +40,12 @@ export const useTasksStore = defineStore('tasks', () => {
 
   /** Ocurrencias visibles en un día (incluye tareas de varios días que lo cubren). */
   function forDay(date) {
-    return occurrences.value.filter((o) => o.date <= date && o.endDate >= date);
+    return occurrences.value.filter(
+      (o) =>
+        o.date <= date &&
+        o.endDate >= date &&
+        (categoryFilter.value === null || o.task.categoryId === categoryFilter.value),
+    );
   }
 
   async function save(task, id) {
@@ -68,9 +81,13 @@ export const useTasksStore = defineStore('tasks', () => {
     occurrences,
     members,
     membersById,
+    categories,
+    categoriesById,
+    categoryFilter,
     loading,
     onlyMine,
     loadMembers,
+    loadCategories,
     load,
     reload,
     forDay,

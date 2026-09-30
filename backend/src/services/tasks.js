@@ -16,6 +16,7 @@ export function serializeTask(task, assigneeIds = []) {
     id: task.id,
     title: task.title,
     notes: task.notes,
+    categoryId: task.category_id,
     color: task.color,
     startDate: task.start_date,
     startTime: task.start_time ? task.start_time.slice(0, 5) : null,

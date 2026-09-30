@@ -26,6 +26,7 @@ export const taskSchema = z
   .object({
     title: z.string().trim().min(1, 'El nombre es obligatorio').max(120),
     notes: z.string().trim().max(2000).nullish().transform((v) => v || null),
+    categoryId: z.number().int().positive().nullish().transform((v) => v ?? null),
     color: colorSchema.default('#e50914'),
     startDate: dateSchema,
     startTime: timeSchema.nullish().transform((v) => v || null),

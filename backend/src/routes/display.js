@@ -18,15 +18,18 @@ const WEEKDAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes
 router.get('/display/today', requireDisplayToken, async (req, res) => {
   const now = nowInZone(config.tz);
   const date = req.query.date ? dateSchema.parse(req.query.date) : now.date;
-  const [occurrences, users] = await Promise.all([
+  const [occurrences, users, categories] = await Promise.all([
     occurrencesInRange(date, date),
     query("SELECT id, name FROM users WHERE role <> 'display'"),
+    query('SELECT id, name FROM categories'),
   ]);
   const names = new Map(users.map((u) => [u.id, u.name]));
+  const categoryNames = new Map(categories.map((c) => [c.id, c.name]));
 
   const tasks = occurrences.map((o) => ({
     id: o.taskId,
     t: o.task.title,
+    cat: categoryNames.get(o.task.categoryId) ?? null,
     time: o.date === date ? o.startTime : null,
     end: o.endTime,
     dur: `${o.task.durationValue}${o.task.durationUnit === 'hours' ? 'h' : 'd'}`,

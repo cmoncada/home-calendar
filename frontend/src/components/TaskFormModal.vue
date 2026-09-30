@@ -22,6 +22,7 @@ const t = props.task;
 const form = reactive({
   title: t?.title ?? '',
   notes: t?.notes ?? '',
+  categoryId: t?.categoryId ?? null,
   color: t?.color ?? COLORS[0],
   startDate: t?.startDate ?? (props.defaultDate || today()),
   allDay: t ? !t.startTime : false,
@@ -41,6 +42,15 @@ const saving = ref(false);
 const isEdit = computed(() => Boolean(props.task));
 const maxDuration = computed(() => (form.durationUnit === 'hours' ? 168 : 365));
 
+function chooseCategory(c) {
+  if (form.categoryId === c.id) {
+    form.categoryId = null;
+    return;
+  }
+  form.categoryId = c.id;
+  form.color = c.color;
+}
+
 function toggleAssignee(id) {
   form.assignees = form.assignees.includes(id) ? form.assignees.filter((a) => a !== id) : [...form.assignees, id];
 }
@@ -49,6 +59,7 @@ function payload() {
   return {
     title: form.title,
     notes: form.notes || null,
+    categoryId: form.categoryId,
     color: form.color,
     startDate: form.startDate,
     startTime: form.allDay ? null : form.startTime,
@@ -103,6 +114,24 @@ async function removeTask() {
         <span>Nombre de la tarea</span>
         <input v-model="form.title" class="input" maxlength="120" placeholder="Ej. Sacar la basura" required autofocus />
       </label>
+
+      <div class="field">
+        <span>Categoría</span>
+        <div class="categories">
+          <button
+            v-for="c in store.categories"
+            :key="c.id"
+            type="button"
+            class="category"
+            :class="{ active: form.categoryId === c.id }"
+            :style="{ '--c': c.color }"
+            :aria-pressed="form.categoryId === c.id"
+            @click="chooseCategory(c)"
+          >
+            <span aria-hidden="true">{{ c.icon }}</span> {{ c.name }}
+          </button>
+        </div>
+      </div>
 
       <div class="row">
         <label class="field">
@@ -259,6 +288,31 @@ async function removeTask() {
 }
 .until .input {
   max-width: 200px;
+}
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.category {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.category:hover {
+  border-color: var(--c);
+}
+.category.active {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+  font-weight: 600;
 }
 .people {
   display: flex;

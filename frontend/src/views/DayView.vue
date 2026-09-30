@@ -32,6 +32,10 @@ function go(step) {
   router.push({ name: 'day', params: { date: addDays(day.value, step) } });
 }
 
+function category(o) {
+  return store.categoriesById.get(o.task.categoryId);
+}
+
 function member(id) {
   return store.membersById.get(id);
 }
@@ -64,6 +68,7 @@ async function removeOccurrence(o) {
 watch(day, load);
 onMounted(() => {
   if (!store.members.length) store.loadMembers();
+  store.loadCategories();
   load();
 });
 </script>
@@ -104,6 +109,9 @@ onMounted(() => {
         </label>
 
         <div class="info">
+          <span v-if="category(o)" class="category" :style="{ '--cc': category(o).color }">
+            {{ category(o).icon }} {{ category(o).name }}
+          </span>
           <h2>{{ o.task.title }}</h2>
           <p class="meta">
             <span>{{ timeLabel(o) }}</span>
@@ -249,6 +257,15 @@ h1 {
 }
 h2 {
   font-size: var(--fs-lg);
+}
+.category {
+  align-self: flex-start;
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cc) 20%, transparent);
+  color: var(--cc);
+  font-size: var(--fs-xs);
+  font-weight: 700;
 }
 .meta {
   display: flex;

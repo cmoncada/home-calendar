@@ -11,7 +11,8 @@ Calendario para organizar las tareas diarias del hogar.
 
 - **Login estilo Netflix:** pantalla "¿Quién va a organizar hoy?" con los perfiles; al elegir uno se pide su contraseña.
 - **Perfiles:** nombre, contraseña de **mínimo 8 caracteres** y avatar (12 avatares incluidos o una foto propia, que se recorta a 256 px WebP). Se crean desde el tile "＋ Añadir perfil".
-- **Tareas:** nombre, fecha, hora opcional ("todo el día"), duración en **horas o días**, color, notas y responsables (uno o varios miembros).
+- **Categorías:** 🧹 Limpieza, 🔧 Mantenimiento, 💳 Pagos y 🔔 Recordatorios. Cada tarea puede tener una (al elegirla se aplica su color) y el calendario se puede filtrar por categoría. Se crean en la migración `003_categories.sql`; para añadir más, inserta filas en la tabla `categories`.
+- **Tareas:** nombre, categoría, fecha, hora opcional ("todo el día"), duración en **horas o días**, color, notas y responsables (uno o varios miembros).
 - **Recurrencia:** semanal (varios días de la semana), mensual (varios días del mes; el 31 cae en el último día de los meses cortos) o **cada N días** (p. ej. cada 15 días, contando desde la fecha de inicio), con fecha fin opcional. Se puede borrar una sola repetición.
 - **Completar:** cada repetición se marca como hecha por separado y se guarda quién la completó.
 - **Vistas:** mes, semana y día (con barra de progreso). Filtro "Solo mis tareas".
@@ -157,7 +158,7 @@ Respuesta (compacta, pensada para ArduinoJson):
   "total": 2,
   "pending": 1,
   "tasks": [
-    { "id": 1, "t": "Sacar la basura", "time": "20:00", "end": "21:00", "dur": "1h", "who": ["Ana"], "done": false, "color": "#e50914" }
+    { "id": 1, "t": "Sacar la basura", "cat": "Limpieza", "time": "20:00", "end": "21:00", "dur": "1h", "who": ["Ana"], "done": false, "color": "#e50914" }
   ]
 }
 ```

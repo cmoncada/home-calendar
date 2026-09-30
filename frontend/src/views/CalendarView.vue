@@ -83,6 +83,7 @@ watch(range, load);
 watch(() => store.onlyMine, load);
 onMounted(() => {
   store.loadMembers();
+  store.loadCategories();
   load();
 });
 </script>
@@ -98,6 +99,10 @@ onMounted(() => {
       </div>
 
       <div class="controls">
+        <select v-model="store.categoryFilter" class="input category-filter" aria-label="Filtrar por categoría">
+          <option :value="null">Todas las categorías</option>
+          <option v-for="c in store.categories" :key="c.id" :value="c.id">{{ c.icon }} {{ c.name }}</option>
+        </select>
         <label class="mine">
           <input v-model="store.onlyMine" type="checkbox" />
           Solo mis tareas
@@ -155,6 +160,11 @@ h1 {
 }
 .btn-icon {
   font-size: 1.4rem;
+}
+.category-filter {
+  width: auto;
+  min-height: 40px;
+  padding: 0 var(--space-3);
 }
 .mine {
   display: flex;

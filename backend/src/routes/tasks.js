@@ -7,12 +7,13 @@ import { expandOccurrences } from '../services/recurrence.js';
 import { dateSchema, idParam, rangeSchema, taskSchema } from '../validation.js';
 
 const router = Router();
-router.use(['/calendar', '/tasks'], requireAuth);
+router.use(['/calendar', '/tasks', '/categories'], requireAuth);
 
 function toRow(data) {
   return {
     title: data.title,
     notes: data.notes,
+    category_id: data.categoryId,
     color: data.color,
     start_date: data.startDate,
     start_time: data.startTime,
@@ -40,6 +41,12 @@ async function setAssignees(conn, taskId, ids) {
   if (ids.length) {
     await conn.query('INSERT INTO task_assignees (task_id, user_id) VALUES ?', [ids.map((u) => [taskId, u])]);
   }
+}
+
+async function validCategory(id) {
+  if (id === null) return;
+  const [row] = await query('SELECT id FROM categories WHERE id = ?', [id]);
+  if (!row) throw new HttpError(400, 'La categoría no existe');
 }
 
 /** Solo el creador, un asignado o un admin pueden modificar la tarea. */
@@ -73,6 +80,11 @@ async function loadOccurrence(req) {
   return { task, date };
 }
 
+router.get('/categories', async (req, res) => {
+  const categories = await query('SELECT id, name, icon, color FROM categories ORDER BY sort_order, name');
+  res.json({ categories });
+});
+
 router.get('/calendar', async (req, res) => {
   const { from, to } = rangeSchema.parse(req.query);
   const mine = req.query.mine === 'true';
@@ -88,6 +100,7 @@ router.get('/tasks/:id', async (req, res) => {
 router.post('/tasks', async (req, res) => {
   const data = taskSchema.parse(req.body);
   const assignees = await validAssignees(data.assignees);
+  await validCategory(data.categoryId);
   const id = await withTransaction(async (conn) => {
     const [result] = await conn.query('INSERT INTO tasks SET ?', [{ ...toRow(data), created_by: req.user.id }]);
     await setAssignees(conn, result.insertId, assignees);
@@ -100,6 +113,7 @@ router.put('/tasks/:id', async (req, res) => {
   const task = await loadEditable(req);
   const data = taskSchema.parse(req.body);
   const assignees = await validAssignees(data.assignees);
+  await validCategory(data.categoryId);
   await withTransaction(async (conn) => {
     await conn.query('UPDATE tasks SET ? WHERE id = ?', [toRow(data), task.id]);
     await setAssignees(conn, task.id, assignees);
