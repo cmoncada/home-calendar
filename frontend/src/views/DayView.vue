@@ -102,8 +102,11 @@ onMounted(() => {
         </label>
 
         <div class="info">
-          <span v-if="category(o)" class="category" :style="{ '--cc': category(o).color }">
-            {{ category(o).icon }} {{ category(o).name }}
+          <span v-if="category(o) || o.task.isPrivate" class="tags">
+            <span v-if="category(o)" class="category" :style="{ '--cc': category(o).color }">
+              {{ category(o).icon }} {{ category(o).name }}
+            </span>
+            <span v-if="o.task.isPrivate" class="private-tag">🔒 Privada</span>
           </span>
           <h2>{{ o.task.title }}</h2>
           <p class="meta">
@@ -254,6 +257,19 @@ h1 {
 }
 h2 {
   font-size: var(--fs-lg);
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.private-tag {
+  padding: 1px var(--space-2);
+  border-radius: 999px;
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-size: var(--fs-xs);
+  font-weight: 700;
 }
 .category {
   align-self: flex-start;

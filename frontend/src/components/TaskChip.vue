@@ -16,6 +16,7 @@ const category = computed(() => store.categoriesById.get(props.occ.task.category
     <span v-if="category" class="icon" :title="category.name">{{ category.icon }}</span>
     <span v-if="showTime && occ.startTime" class="time">{{ occ.startTime }}</span>
     <span class="title">{{ occ.task.title }}</span>
+    <span v-if="occ.task.isPrivate" class="lock" title="Privada">🔒</span>
   </span>
 </template>
 
@@ -35,6 +36,11 @@ const category = computed(() => store.categoriesById.get(props.occ.task.category
 .icon {
   flex-shrink: 0;
   font-size: 0.85em;
+}
+.lock {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.8em;
 }
 .time {
   flex-shrink: 0;

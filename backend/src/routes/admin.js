@@ -93,6 +93,8 @@ router.delete('/admin/users/:id', async (req, res) => {
   if (user.role === 'admin' && (await adminCount()) <= 1) {
     throw new HttpError(400, 'Debe quedar al menos un administrador');
   }
+  // Sus tareas privadas no las puede ver nadie más: se eliminan con el usuario.
+  await query('DELETE FROM tasks WHERE is_private = 1 AND created_by = ?', [user.id]);
   await query('DELETE FROM users WHERE id = ?', [user.id]);
   await deleteUploadedAvatar(user);
   res.status(204).end();

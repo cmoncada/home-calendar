@@ -12,6 +12,7 @@ Calendario para organizar las tareas diarias del hogar.
 - **Login estilo Netflix:** pantalla "¿Quién va a organizar hoy?" con los perfiles; al elegir uno se pide su contraseña.
 - **Perfiles:** nombre, contraseña de **mínimo 8 caracteres** y avatar (12 avatares incluidos o una foto propia, que se recorta a 256 px WebP). Se crean desde el tile "＋ Añadir perfil".
 - **Categorías:** 🧹 Limpieza, 🔧 Mantenimiento, 💳 Pagos y 🔔 Recordatorios. Cada tarea puede tener una (al elegirla se aplica su color) y el calendario se puede filtrar por categoría. Se crean en la migración `003_categories.sql`; para añadir más, inserta filas en la tabla `categories`.
+- **Tareas privadas:** al crear una tarea se puede marcar como 🔒 privada; solo la ve quien la creó (ni el administrador ni la pantalla del ESP32). Si el administrador elimina a ese usuario, sus tareas privadas se eliminan con él.
 - **Tareas:** nombre, categoría, fecha, hora opcional ("todo el día"), duración en **horas o días**, color, notas y responsables (uno o varios miembros).
 - **Recurrencia:** semanal (varios días de la semana), mensual (varios días del mes; el 31 cae en el último día de los meses cortos) o **cada N días** (p. ej. cada 15 días, contando desde la fecha de inicio), con fecha fin opcional. Se puede borrar una sola repetición.
 - **Completar:** cada repetición se marca como hecha por separado y se guarda quién la completó.

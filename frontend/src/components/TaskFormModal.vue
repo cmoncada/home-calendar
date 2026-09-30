@@ -26,6 +26,7 @@ const form = reactive({
   title: t?.title ?? '',
   notes: t?.notes ?? '',
   categoryId: t?.categoryId ?? null,
+  isPrivate: t?.isPrivate ?? false,
   color: t?.color ?? COLORS[0],
   startDate: t?.startDate ?? (props.defaultDate || today()),
   allDay: t ? !t.startTime : false,
@@ -44,6 +45,8 @@ const error = ref('');
 const saving = ref(false);
 const confirmingDelete = ref(false);
 const isEdit = computed(() => Boolean(props.task));
+// Solo quien crea la tarea puede marcarla o desmarcarla como privada
+const canSetPrivate = computed(() => !props.task || props.task.createdBy === auth.user.id);
 const maxDuration = computed(() => (form.durationUnit === 'hours' ? 168 : 365));
 
 function chooseCategory(c) {
@@ -64,6 +67,7 @@ function payload() {
     title: form.title,
     notes: form.notes || null,
     categoryId: form.categoryId,
+    isPrivate: form.isPrivate,
     color: form.color,
     startDate: form.startDate,
     startTime: form.allDay ? null : form.startTime,
@@ -73,7 +77,7 @@ function payload() {
     recurrenceDays: form.recurrenceDays,
     recurrenceInterval: form.recurrenceType === 'interval' ? Number(form.recurrenceInterval) : null,
     recurrenceUntil: form.recurrenceType !== 'none' && form.hasUntil ? form.recurrenceUntil || null : null,
-    assignees: form.assignees,
+    assignees: form.isPrivate ? [auth.user.id] : form.assignees,
   };
 }
 
@@ -165,7 +169,16 @@ async function submit() {
         </div>
       </div>
 
-      <div class="field">
+      <label v-if="canSetPrivate" class="private" :class="{ on: form.isPrivate }">
+        <input v-model="form.isPrivate" type="checkbox" role="switch" />
+        <span class="switch" aria-hidden="true"></span>
+        <span class="private-text">
+          <strong>🔒 Tarea privada</strong>
+          <small class="muted">Solo tú la verás en tu calendario. No aparece a los demás ni en la pantalla del ESP32.</small>
+        </span>
+      </label>
+
+      <div v-if="!form.isPrivate" class="field">
         <span>Responsables</span>
         <div class="people">
           <button
@@ -285,6 +298,65 @@ async function submit() {
 }
 .until .input {
   max-width: 200px;
+}
+.private {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.private.on {
+  border-color: var(--color-text-muted);
+  background: var(--color-surface);
+}
+.private input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--color-surface-hover);
+  transition: background var(--transition);
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  transition: transform var(--transition), background var(--transition);
+}
+.private.on .switch {
+  background: var(--color-accent);
+}
+.private.on .switch::after {
+  transform: translateX(18px);
+  background: #fff;
+}
+.private input:focus-visible + .switch {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.private-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--fs-sm);
+}
+.private-text small {
+  font-size: var(--fs-xs);
 }
 .categories {
   display: flex;

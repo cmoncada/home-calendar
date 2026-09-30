@@ -17,6 +17,7 @@ export function serializeTask(task, assigneeIds = []) {
     title: task.title,
     notes: task.notes,
     categoryId: task.category_id,
+    isPrivate: Boolean(task.is_private),
     color: task.color,
     startDate: task.start_date,
     startTime: task.start_time ? task.start_time.slice(0, 5) : null,
@@ -31,9 +32,15 @@ export function serializeTask(task, assigneeIds = []) {
   };
 }
 
-export async function getTask(id) {
+/** Una tarea privada solo es visible para quien la creó. */
+function visibleTo(task, viewerId) {
+  return !task.is_private || task.created_by === viewerId;
+}
+
+/** Devuelve la tarea si existe y `viewerId` puede verla; si no, null. */
+export async function getTask(id, viewerId) {
   const [task] = await query('SELECT * FROM tasks WHERE id = ?', [id]);
-  if (!task) return null;
+  if (!task || !visibleTo(task, viewerId)) return null;
   const rows = await query('SELECT user_id FROM task_assignees WHERE task_id = ?', [id]);
   return serializeTask(task, rows.map((r) => r.user_id));
 }
@@ -41,15 +48,18 @@ export async function getTask(id) {
 /**
  * Devuelve todas las ocurrencias en [from, to], ordenadas por fecha y hora,
  * con la tarea, sus asignados y el estado de completado.
+ * - viewerId: usuario que consulta; sin él (pantalla ESP32) se excluyen todas las tareas privadas.
+ * - userId: si se indica, solo tareas asignadas a ese usuario.
  */
-export async function occurrencesInRange(from, to, { userId } = {}) {
+export async function occurrencesInRange(from, to, { userId, viewerId = null } = {}) {
   // La duración máxima es 365 días, así que una tarea única que empezó hace más no puede solaparse.
   const tasks = await query(
     `SELECT * FROM tasks
       WHERE start_date <= ?
         AND (recurrence_type <> 'none' OR start_date >= ?)
-        AND (recurrence_until IS NULL OR recurrence_until >= ?)`,
-    [to, addDays(from, -366), addDays(from, -366)],
+        AND (recurrence_until IS NULL OR recurrence_until >= ?)
+        AND (is_private = 0 OR created_by = ?)`,
+    [to, addDays(from, -366), addDays(from, -366), viewerId],
   );
   if (!tasks.length) return [];
 

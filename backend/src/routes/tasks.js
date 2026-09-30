@@ -14,6 +14,7 @@ function toRow(data) {
     title: data.title,
     notes: data.notes,
     category_id: data.categoryId,
+    is_private: data.isPrivate ? 1 : 0,
     color: data.color,
     start_date: data.startDate,
     start_time: data.startTime,
@@ -51,7 +52,7 @@ async function validCategory(id) {
 
 /** Solo el creador, un asignado o un admin pueden modificar la tarea. */
 async function loadEditable(req) {
-  const task = await getTask(idParam.parse(req.params.id));
+  const task = await getTask(idParam.parse(req.params.id), req.user.id);
   if (!task) throw new HttpError(404, 'Tarea no encontrada');
   const u = req.user;
   if (u.role !== 'admin' && task.createdBy !== u.id && !task.assignees.includes(u.id)) {
@@ -61,7 +62,7 @@ async function loadEditable(req) {
 }
 
 async function loadOccurrence(req) {
-  const task = await getTask(idParam.parse(req.params.id));
+  const task = await getTask(idParam.parse(req.params.id), req.user.id);
   if (!task) throw new HttpError(404, 'Tarea no encontrada');
   const date = dateSchema.parse(req.params.date);
   const row = {
@@ -88,37 +89,41 @@ router.get('/categories', async (req, res) => {
 router.get('/calendar', async (req, res) => {
   const { from, to } = rangeSchema.parse(req.query);
   const mine = req.query.mine === 'true';
-  res.json({ occurrences: await occurrencesInRange(from, to, { userId: mine ? req.user.id : undefined }) });
+  res.json({ occurrences: await occurrencesInRange(from, to, { userId: mine ? req.user.id : undefined, viewerId: req.user.id }) });
 });
 
 router.get('/tasks/:id', async (req, res) => {
-  const task = await getTask(idParam.parse(req.params.id));
+  const task = await getTask(idParam.parse(req.params.id), req.user.id);
   if (!task) throw new HttpError(404, 'Tarea no encontrada');
   res.json({ task });
 });
 
 router.post('/tasks', async (req, res) => {
   const data = taskSchema.parse(req.body);
-  const assignees = await validAssignees(data.assignees);
+  // Una tarea privada solo la ve su creador, así que es el único responsable posible.
+  const assignees = data.isPrivate ? [req.user.id] : await validAssignees(data.assignees);
   await validCategory(data.categoryId);
   const id = await withTransaction(async (conn) => {
     const [result] = await conn.query('INSERT INTO tasks SET ?', [{ ...toRow(data), created_by: req.user.id }]);
     await setAssignees(conn, result.insertId, assignees);
     return result.insertId;
   });
-  res.status(201).json({ task: await getTask(id) });
+  res.status(201).json({ task: await getTask(id, req.user.id) });
 });
 
 router.put('/tasks/:id', async (req, res) => {
   const task = await loadEditable(req);
   const data = taskSchema.parse(req.body);
-  const assignees = await validAssignees(data.assignees);
+  if (data.isPrivate && task.createdBy !== req.user.id) {
+    throw new HttpError(403, 'Solo quien creó la tarea puede hacerla privada');
+  }
+  const assignees = data.isPrivate ? [task.createdBy] : await validAssignees(data.assignees);
   await validCategory(data.categoryId);
   await withTransaction(async (conn) => {
     await conn.query('UPDATE tasks SET ? WHERE id = ?', [toRow(data), task.id]);
     await setAssignees(conn, task.id, assignees);
   });
-  res.json({ task: await getTask(task.id) });
+  res.json({ task: await getTask(task.id, req.user.id) });
 });
 
 router.delete('/tasks/:id', async (req, res) => {
