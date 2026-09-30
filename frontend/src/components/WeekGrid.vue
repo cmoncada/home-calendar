@@ -7,7 +7,7 @@ const props = defineProps({
   weekStart: { type: String, required: true },
   forDay: { type: Function, required: true },
 });
-const emit = defineEmits(['select-day', 'toggle']);
+const emit = defineEmits(['open-day', 'create', 'toggle']);
 
 const todayStr = today();
 
@@ -22,7 +22,7 @@ const days = computed(() =>
 <template>
   <div class="week">
     <section v-for="d in days" :key="d.date" class="col" :class="{ today: d.isToday }">
-      <button type="button" class="col-head" @click="emit('select-day', d.date)">
+      <button type="button" class="col-head" @click="emit('open-day', d.date)">
         <span class="name">{{ d.name }}</span>
         <span class="num">{{ d.day }}</span>
       </button>
@@ -38,6 +38,7 @@ const days = computed(() =>
         </li>
         <li v-if="!d.items.length" class="empty">Libre</li>
       </ul>
+      <button type="button" class="add" @click="emit('create', d.date)">＋ Añadir</button>
     </section>
   </div>
 </template>
@@ -105,6 +106,21 @@ const days = computed(() =>
 }
 .grow {
   flex: 1;
+}
+.add {
+  margin-top: auto;
+  padding: var(--space-2);
+  border: 0;
+  border-top: 1px dashed var(--color-border);
+  background: none;
+  color: var(--color-text-faint);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+.add:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
 }
 .empty {
   font-size: var(--fs-xs);

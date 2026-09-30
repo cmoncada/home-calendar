@@ -36,6 +36,7 @@ function writePref(key, value) {
 const mode = ref(readPref('hc.view', window.innerWidth < 720 ? 'week' : 'month'));
 const cursor = ref(today());
 const showForm = ref(false);
+const formDate = ref(today());
 const error = ref('');
 
 const range = computed(() => {
@@ -64,6 +65,15 @@ async function load() {
 
 function move(step) {
   cursor.value = mode.value === 'week' ? addDays(cursor.value, step * 7) : addMonths(cursor.value, step);
+}
+
+function openCreate(date) {
+  formDate.value = date;
+  showForm.value = true;
+}
+
+function openDay(date) {
+  router.push({ name: 'day', params: { date } });
 }
 
 function setMode(value) {
@@ -111,7 +121,7 @@ onMounted(() => {
           <button type="button" :class="{ active: mode === 'month' }" @click="setMode('month')">Mes</button>
           <button type="button" :class="{ active: mode === 'week' }" @click="setMode('week')">Semana</button>
         </div>
-        <button class="btn btn-primary" type="button" @click="showForm = true">＋ Nueva tarea</button>
+        <button class="btn btn-primary" type="button" @click="openCreate(today())">＋ Nueva tarea</button>
       </div>
     </div>
 
@@ -122,18 +132,20 @@ onMounted(() => {
         v-if="mode === 'month'"
         :month="startOfMonth(cursor)"
         :for-day="store.forDay"
-        @select-day="(d) => router.push({ name: 'day', params: { date: d } })"
+        @create="openCreate"
+        @open-day="openDay"
       />
       <WeekGrid
         v-else
         :week-start="range.from"
         :for-day="store.forDay"
-        @select-day="(d) => router.push({ name: 'day', params: { date: d } })"
+        @create="openCreate"
+        @open-day="openDay"
         @toggle="toggle"
       />
     </div>
 
-    <TaskFormModal v-if="showForm" :default-date="today()" @close="showForm = false" />
+    <TaskFormModal v-if="showForm" :default-date="formDate" @close="showForm = false" />
   </main>
 </template>
 

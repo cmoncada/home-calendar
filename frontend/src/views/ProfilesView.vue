@@ -76,7 +76,7 @@ async function login(password) {
           </button>
         </li>
         <li v-if="allowRegistration && !manageMode">
-          <RouterLink to="/nuevo-perfil" class="tile add">
+          <RouterLink to="/profiles/new" class="tile add">
             <span class="tile-img add-img"><span>＋</span></span>
             <span class="tile-name">Añadir perfil</span>
           </RouterLink>

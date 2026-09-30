@@ -10,7 +10,7 @@ const props = defineProps({ date: { type: String, required: true } });
 const store = useTasksStore();
 const router = useRouter();
 
-const day = computed(() => (props.date === 'hoy' || !/^\d{4}-\d{2}-\d{2}$/.test(props.date) ? today() : props.date));
+const day = computed(() => (props.date === 'today' || !/^\d{4}-\d{2}-\d{2}$/.test(props.date) ? today() : props.date));
 const items = computed(() => store.forDay(day.value));
 const done = computed(() => items.value.filter((o) => o.completed).length);
 const progress = computed(() => (items.value.length ? Math.round((done.value / items.value.length) * 100) : 0));

@@ -22,7 +22,7 @@ async function switchProfile() {
 
     <nav class="nav">
       <RouterLink to="/" class="nav-link">Calendario</RouterLink>
-      <RouterLink :to="{ name: 'day', params: { date: 'hoy' } }" class="nav-link">Hoy</RouterLink>
+      <RouterLink :to="{ name: 'day', params: { date: 'today' } }" class="nav-link">Hoy</RouterLink>
       <RouterLink v-if="auth.isAdmin" to="/admin" class="nav-link">Administrar</RouterLink>
     </nav>
 
@@ -33,7 +33,7 @@ async function switchProfile() {
       </button>
       <div v-if="menuOpen" class="menu" role="menu">
         <p class="menu-name">{{ auth.user.name }}</p>
-        <RouterLink to="/perfil" class="menu-item" role="menuitem" @click="menuOpen = false">Mi perfil</RouterLink>
+        <RouterLink to="/profile" class="menu-item" role="menuitem" @click="menuOpen = false">Mi perfil</RouterLink>
         <RouterLink v-if="auth.isAdmin" to="/admin" class="menu-item" role="menuitem" @click="menuOpen = false">
           Administrar usuarios
         </RouterLink>

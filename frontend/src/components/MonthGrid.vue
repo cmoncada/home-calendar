@@ -7,7 +7,8 @@ const props = defineProps({
   month: { type: String, required: true },
   forDay: { type: Function, required: true },
 });
-const emit = defineEmits(['select-day']);
+// create: clic en el hueco del día (nueva tarea); open-day: clic en el número o en una tarea
+const emit = defineEmits(['create', 'open-day']);
 
 const MAX_VISIBLE = 3;
 const todayStr = today();
@@ -35,21 +36,37 @@ const days = computed(() => {
     <div v-for="d in WEEK_ORDER" :key="d" class="weekday">
       <span class="long">{{ WEEKDAY_NAMES[d] }}</span><span class="short">{{ WEEKDAY_NAMES[d].slice(0, 3) }}</span>
     </div>
-    <button
+    <div
       v-for="cell in days"
       :key="cell.date"
-      type="button"
       class="cell"
       :class="{ outside: cell.outside, today: cell.isToday }"
-      @click="emit('select-day', cell.date)"
+      role="button"
+      tabindex="0"
+      :aria-label="`Nueva tarea el ${cell.date}`"
+      @click="emit('create', cell.date)"
+      @keydown.enter.self="emit('create', cell.date)"
     >
-      <span class="num">{{ cell.day }}</span>
+      <button type="button" class="num" :title="`Ver el día ${cell.day}`" @click.stop="emit('open-day', cell.date)">
+        {{ cell.day }}
+      </button>
       <span class="items">
-        <TaskChip v-for="o in cell.items" :key="`${o.taskId}-${o.date}`" :occ="o" />
-        <span v-if="cell.more" class="more">+{{ cell.more }} más</span>
+        <button
+          v-for="o in cell.items"
+          :key="`${o.taskId}-${o.date}`"
+          type="button"
+          class="chip-btn"
+          @click.stop="emit('open-day', cell.date)"
+        >
+          <TaskChip :occ="o" />
+        </button>
+        <button v-if="cell.more" type="button" class="more" @click.stop="emit('open-day', cell.date)">
+          +{{ cell.more }} más
+        </button>
       </span>
       <span v-if="cell.pending" class="dot" :aria-label="`${cell.pending} pendientes`">{{ cell.pending }}</span>
-    </button>
+      <span class="add-hint" aria-hidden="true">＋</span>
+    </div>
   </div>
 </template>
 
@@ -92,6 +109,21 @@ const days = computed(() => {
 .cell:hover {
   background: var(--color-bg-elevated);
 }
+.cell:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: -2px;
+}
+.add-hint {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  color: var(--color-text-faint);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.cell:hover .add-hint {
+  opacity: 1;
+}
 .cell.outside {
   background: #101010;
 }
@@ -99,6 +131,11 @@ const days = computed(() => {
   color: var(--color-text-faint);
 }
 .num {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: background var(--transition);
   font-size: var(--fs-sm);
   font-weight: 600;
   width: 26px;
@@ -106,6 +143,9 @@ const days = computed(() => {
   display: grid;
   place-items: center;
   border-radius: 50%;
+}
+.num:hover {
+  background: var(--color-surface-hover);
 }
 .today .num {
   background: var(--color-accent);
@@ -117,13 +157,38 @@ const days = computed(() => {
   gap: 2px;
   min-width: 0;
 }
+.chip-btn {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.chip-btn:hover {
+  filter: brightness(1.25);
+}
 .more {
+  padding: 0 var(--space-1);
+  border: 0;
+  background: none;
+  text-align: left;
   font-size: var(--fs-xs);
   color: var(--color-text-muted);
-  padding-left: var(--space-1);
+  cursor: pointer;
+}
+.more:hover {
+  color: var(--color-text);
 }
 .dot {
   display: none;
+}
+@media (hover: none) {
+  .add-hint {
+    display: none;
+  }
 }
 @media (max-width: 720px) {
   .weekday .long {

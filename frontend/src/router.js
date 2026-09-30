@@ -5,10 +5,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'profiles', component: () => import('./views/ProfilesView.vue'), meta: { guest: true } },
-    { path: '/nuevo-perfil', name: 'add-profile', component: () => import('./views/AddProfileView.vue'), meta: { guest: true } },
+    { path: '/profiles/new', name: 'add-profile', component: () => import('./views/AddProfileView.vue'), meta: { guest: true } },
     { path: '/', name: 'calendar', component: () => import('./views/CalendarView.vue') },
-    { path: '/dia/:date', name: 'day', component: () => import('./views/DayView.vue'), props: true },
-    { path: '/perfil', name: 'settings', component: () => import('./views/ProfileSettingsView.vue') },
+    { path: '/day/:date', name: 'day', component: () => import('./views/DayView.vue'), props: true },
+    { path: '/profile', name: 'settings', component: () => import('./views/ProfileSettingsView.vue') },
     { path: '/admin', name: 'admin', component: () => import('./views/AdminView.vue'), meta: { admin: true } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
