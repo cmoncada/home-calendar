@@ -77,7 +77,17 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
+  /** Olvida los datos del usuario anterior (al cerrar sesión). */
+  function clear() {
+    occurrences.value = [];
+    members.value = [];
+    categoryFilter.value = null;
+    onlyMine.value = false;
+    lastRange = null;
+  }
+
   return {
+    clear,
     occurrences,
     members,
     membersById,

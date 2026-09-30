@@ -2,9 +2,11 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppHeader from './components/AppHeader.vue';
+import { useAuthStore } from './stores/auth.js';
 
 const route = useRoute();
-const showHeader = computed(() => route.name && !route.meta.guest);
+const auth = useAuthStore();
+const showHeader = computed(() => route.name && !route.meta.guest && auth.user);
 </script>
 
 <template>

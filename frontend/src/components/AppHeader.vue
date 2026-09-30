@@ -2,15 +2,18 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
+import { useTasksStore } from '../stores/tasks.js';
 
 const auth = useAuthStore();
 const router = useRouter();
 const menuOpen = ref(false);
 
-async function switchProfile() {
+async function logout() {
   menuOpen.value = false;
   await auth.logout();
-  router.push({ name: 'profiles' });
+  useTasksStore().clear();
+  // replace: evita volver con "atrás" a una página que ya requiere sesión
+  await router.replace({ name: 'profiles' });
 }
 </script>
 
@@ -37,7 +40,10 @@ async function switchProfile() {
         <RouterLink v-if="auth.isAdmin" to="/admin" class="menu-item" role="menuitem" @click="menuOpen = false">
           Administrar usuarios
         </RouterLink>
-        <button class="menu-item" type="button" role="menuitem" @click="switchProfile">Cambiar de perfil</button>
+        <hr class="menu-sep" />
+        <button class="menu-item logout" type="button" role="menuitem" @click="logout">
+          <span aria-hidden="true">⎋</span> Cerrar sesión
+        </button>
       </div>
     </div>
   </header>
@@ -140,6 +146,16 @@ async function switchProfile() {
 }
 .menu-item:hover {
   text-decoration: underline;
+}
+.menu-sep {
+  margin: var(--space-1) 0;
+  border: 0;
+  border-top: 1px solid #333;
+}
+.logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 @media (max-width: 600px) {
   .header {
