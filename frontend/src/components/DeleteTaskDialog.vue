@@ -30,6 +30,7 @@ async function run(fn) {
 }
 
 const removeOne = () => run(() => store.removeOccurrence(props.task.id, props.date));
+const removeFollowing = () => run(() => store.removeOccurrence(props.task.id, props.date, 'following'));
 const removeAll = () => run(() => store.remove(props.task.id));
 </script>
 
@@ -45,6 +46,10 @@ const removeAll = () => run(() => store.remove(props.task.id));
         <button v-if="date" class="option" type="button" :disabled="busy" @click="removeOne">
           <span class="title">Solo esta</span>
           <span class="muted">La del {{ formatLong(date).toLowerCase() }}. Las demás se mantienen.</span>
+        </button>
+        <button v-if="date" class="option" type="button" :disabled="busy" @click="removeFollowing">
+          <span class="title">Esta y las siguientes</span>
+          <span class="muted">Desde el {{ formatLong(date).toLowerCase() }} en adelante. Las anteriores se mantienen.</span>
         </button>
         <button class="option danger" type="button" :disabled="busy" @click="removeAll">
           <span class="title">Todas las repeticiones</span>

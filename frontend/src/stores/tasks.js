@@ -59,8 +59,9 @@ export const useTasksStore = defineStore('tasks', () => {
     await reload();
   }
 
-  async function removeOccurrence(id, date) {
-    await api.del(`/tasks/${id}/occurrences/${date}`);
+  /** scope: 'single' (solo esa repetición) o 'following' (esa y las siguientes) */
+  async function removeOccurrence(id, date, scope = 'single') {
+    await api.del(`/tasks/${id}/occurrences/${date}?scope=${scope}`);
     await reload();
   }
 

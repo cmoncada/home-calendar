@@ -14,7 +14,7 @@ Calendario para organizar las tareas diarias del hogar.
 - **Categorías:** 🧹 Limpieza, 🔧 Mantenimiento, 💳 Pagos y 🔔 Recordatorios. Cada tarea puede tener una (al elegirla se aplica su color) y el calendario se puede filtrar por categoría. Se crean en la migración `003_categories.sql`; para añadir más, inserta filas en la tabla `categories`.
 - **Tareas privadas:** al crear una tarea se puede marcar como 🔒 privada; solo la ve quien la creó (ni el administrador ni la pantalla del ESP32). Si el administrador elimina a ese usuario, sus tareas privadas se eliminan con él.
 - **Tareas:** nombre, categoría, fecha, hora opcional ("todo el día"), duración en **horas o días**, color, notas y responsables (uno o varios miembros).
-- **Recurrencia:** semanal (varios días de la semana), mensual (varios días del mes; el 31 cae en el último día de los meses cortos) o **cada N días** (p. ej. cada 15 días, contando desde la fecha de inicio), con fecha fin opcional. Se puede borrar una sola repetición.
+- **Recurrencia:** semanal (varios días de la semana), mensual (varios días del mes; el 31 cae en el último día de los meses cortos) o **cada N días** (p. ej. cada 15 días, contando desde la fecha de inicio), con fecha fin opcional. Al borrar una tarea que se repite se elige entre solo esa repetición, esa y las siguientes, o todas.
 - **Completar:** cada repetición se marca como hecha por separado y se guarda quién la completó.
 - **Vistas:** mes, semana y día (con barra de progreso). Filtro "Solo mis tareas".
 - **Superusuario (admin):** crea, desactiva o elimina usuarios, cambia roles, restablece contraseñas y gestiona los tokens del ESP32. Siempre queda al menos un administrador.

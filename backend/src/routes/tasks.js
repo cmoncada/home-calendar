@@ -4,7 +4,9 @@ import { HttpError } from '../middleware/errors.js';
 import { requireAuth } from '../middleware/auth.js';
 import { getTask, occurrencesInRange } from '../services/tasks.js';
 import { expandOccurrences } from '../services/recurrence.js';
+import { addDays, maxDate } from '../services/dates.js';
 import { dateSchema, idParam, rangeSchema, taskSchema } from '../validation.js';
+import { z } from 'zod';
 
 const router = Router();
 router.use(['/calendar', '/tasks', '/categories'], requireAuth);
@@ -78,7 +80,7 @@ async function loadOccurrence(req) {
   };
   const exists = expandOccurrences(row, date, date).some((o) => o.date === date);
   if (!exists) throw new HttpError(400, 'La tarea no ocurre en esa fecha');
-  return { task, date };
+  return { task, date, row };
 }
 
 router.get('/categories', async (req, res) => {
@@ -133,13 +135,38 @@ router.delete('/tasks/:id', async (req, res) => {
 });
 
 /** Elimina una sola ocurrencia de una tarea recurrente. */
+/** ¿Queda alguna repetición visible antes de `date`? */
+async function hasEarlierOccurrence(row, date) {
+  const rows = await query('SELECT occurrence_date FROM task_exceptions WHERE task_id = ?', [row.id]);
+  const exceptions = new Set(rows.map((r) => r.occurrence_date));
+  // Basta con mirar un año hacia atrás: el intervalo máximo de repetición es de 365 días
+  const from = maxDate(row.start_date, addDays(date, -399));
+  return expandOccurrences(row, from, addDays(date, -1), exceptions).some((o) => o.date < date);
+}
+
+/**
+ * Elimina repeticiones de una tarea.
+ *   scope=single (por defecto): solo la de esa fecha.
+ *   scope=following: esa y todas las siguientes (la repetición termina el día anterior).
+ */
 router.delete('/tasks/:id/occurrences/:date', async (req, res) => {
+  const { scope } = z.object({ scope: z.enum(['single', 'following']).default('single') }).parse(req.query);
   await loadEditable(req);
-  const { task, date } = await loadOccurrence(req);
+  const { task, date, row } = await loadOccurrence(req);
+
   if (task.recurrenceType === 'none') {
     await query('DELETE FROM tasks WHERE id = ?', [task.id]);
-  } else {
+  } else if (scope === 'single') {
     await query('INSERT IGNORE INTO task_exceptions (task_id, occurrence_date) VALUES (?, ?)', [task.id, date]);
+  } else if (!(await hasEarlierOccurrence(row, date))) {
+    // Era la primera repetición: no queda nada, se borra la tarea
+    await query('DELETE FROM tasks WHERE id = ?', [task.id]);
+  } else {
+    await withTransaction(async (conn) => {
+      await conn.query('UPDATE tasks SET recurrence_until = ? WHERE id = ?', [addDays(date, -1), task.id]);
+      await conn.query('DELETE FROM task_completions WHERE task_id = ? AND occurrence_date >= ?', [task.id, date]);
+      await conn.query('DELETE FROM task_exceptions WHERE task_id = ? AND occurrence_date >= ?', [task.id, date]);
+    });
   }
   res.status(204).end();
 });
