@@ -372,7 +372,7 @@ pre {
   margin-bottom: var(--space-4);
   border: 1px solid var(--color-warning);
   border-radius: var(--radius-md);
-  background: rgba(245, 197, 24, 0.07);
+  background: var(--color-warning-soft);
 }
 .token-box {
   display: flex;
@@ -382,14 +382,14 @@ pre {
 }
 .token-box code {
   padding: var(--space-2) var(--space-3);
-  background: #0b0b0b;
+  background: var(--color-code-bg);
   border-radius: var(--radius-sm);
   word-break: break-all;
 }
 .curl {
   margin: 0;
   padding: var(--space-3);
-  background: #0b0b0b;
+  background: var(--color-code-bg);
   border-radius: var(--radius-sm);
   overflow-x: auto;
   color: var(--color-text-muted);
@@ -402,7 +402,7 @@ pre {
 .ok {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  background: rgba(46, 204, 113, 0.12);
+  background: var(--color-success-soft);
   color: var(--color-success);
   font-size: var(--fs-sm);
 }

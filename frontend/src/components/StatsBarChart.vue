@@ -165,7 +165,7 @@ svg {
   cursor: pointer;
 }
 .bar:hover .hit {
-  fill: rgba(255, 255, 255, 0.03);
+  fill: var(--color-hover-tint);
 }
 .tooltip {
   position: absolute;
@@ -178,7 +178,7 @@ svg {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: rgba(10, 10, 10, 0.95);
+  background: var(--color-tooltip-bg);
   box-shadow: var(--shadow-lg);
   font-size: var(--fs-xs);
   pointer-events: none;

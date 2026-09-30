@@ -53,7 +53,7 @@ function submit() {
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  background: rgba(10, 10, 10, 0.97);
+  background: var(--color-lock-bg);
   animation: appear 200ms ease;
 }
 .back {
@@ -92,7 +92,7 @@ form {
   width: 100%;
   height: 56px;
   padding: 0 var(--space-4);
-  border: 2px solid #fff;
+  border: 2px solid var(--color-strong);
   border-radius: var(--radius-sm);
   background: transparent;
   font-size: var(--fs-lg);
@@ -101,7 +101,7 @@ form {
 }
 .lock-input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 .lock-input.shake {
   border-color: var(--color-danger);

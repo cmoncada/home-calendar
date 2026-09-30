@@ -104,7 +104,7 @@ async function login(password) {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(ellipse at top, #1d1d1d 0%, #141414 55%, #0b0b0b 100%);
+  background: var(--color-profiles-bg);
 }
 .brand {
   padding: var(--space-5) var(--space-6);
@@ -170,12 +170,12 @@ h1 {
 }
 .tile:hover .tile-img,
 .tile:focus-visible .tile-img {
-  border-color: #fff;
+  border-color: var(--color-strong);
   transform: scale(1.05);
 }
 .tile:hover,
 .tile:focus-visible {
-  color: #fff;
+  color: var(--color-strong);
 }
 .tile:focus-visible {
   outline: none;
@@ -206,14 +206,14 @@ h1 {
   width: 60%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: #333;
+  background: var(--color-surface-hover);
   font-size: clamp(1.8rem, 4vw, 3.5rem);
   color: var(--color-text-muted);
   transition: background var(--transition), color var(--transition);
 }
 .add:hover .add-img span {
-  background: #fff;
-  color: #141414;
+  background: var(--color-strong);
+  color: var(--color-bg);
 }
 .edit-overlay {
   position: absolute;
@@ -236,8 +236,8 @@ h1 {
   transition: color var(--transition), border-color var(--transition);
 }
 .manage:hover {
-  color: #fff;
-  border-color: #fff;
+  color: var(--color-strong);
+  border-color: var(--color-strong);
 }
 @keyframes rise {
   from {

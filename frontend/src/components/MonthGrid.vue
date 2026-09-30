@@ -75,8 +75,8 @@ const days = computed(() => {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
-  background: #2a2a2a;
-  border: 1px solid #2a2a2a;
+  background: var(--color-divider);
+  border: 1px solid var(--color-divider);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -125,7 +125,7 @@ const days = computed(() => {
   opacity: 1;
 }
 .cell.outside {
-  background: #101010;
+  background: var(--color-bg-sunken);
 }
 .cell.outside .num {
   color: var(--color-text-faint);
@@ -149,7 +149,7 @@ const days = computed(() => {
 }
 .today .num {
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-accent);
 }
 .items {
   display: flex;

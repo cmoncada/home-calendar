@@ -169,7 +169,7 @@ h2 {
 .ok {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  background: rgba(46, 204, 113, 0.12);
+  background: var(--color-success-soft);
   color: var(--color-success);
   font-size: var(--fs-sm);
 }

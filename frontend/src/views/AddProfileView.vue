@@ -152,7 +152,7 @@ h1 {
 .panel > .muted {
   margin-top: calc(-1 * var(--space-4));
   padding-bottom: var(--space-4);
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--color-divider);
 }
 .identity {
   display: flex;
@@ -173,7 +173,7 @@ h1 {
   display: flex;
   gap: var(--space-3);
   padding-top: var(--space-4);
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--color-divider);
 }
 .actions .btn {
   min-width: 140px;

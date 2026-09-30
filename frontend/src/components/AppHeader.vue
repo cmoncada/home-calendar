@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
 import { useTasksStore } from '../stores/tasks.js';
+import { theme, toggleTheme } from '../utils/theme.js';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -44,6 +45,10 @@ async function logout() {
         <RouterLink v-if="auth.isAdmin" to="/admin" class="menu-item" role="menuitem" @click="menuOpen = false">
           Administrar usuarios
         </RouterLink>
+        <button class="menu-item with-icon" type="button" role="menuitemcheckbox" :aria-checked="theme === 'light'" @click="toggleTheme">
+          <span aria-hidden="true">{{ theme === 'dark' ? '☀️' : '🌙' }}</span>
+          {{ theme === 'dark' ? 'Tema claro' : 'Tema oscuro' }}
+        </button>
         <hr class="menu-sep" />
         <button class="menu-item logout" type="button" role="menuitem" @click="logout">
           <span aria-hidden="true">⎋</span> Cerrar sesión
@@ -63,9 +68,9 @@ async function logout() {
   gap: var(--space-5);
   height: var(--header-h);
   padding: 0 var(--space-4);
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(20, 20, 20, 0.95));
+  background: var(--color-header-bg);
   backdrop-filter: blur(6px);
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--color-divider);
 }
 .brand {
   display: flex;
@@ -126,15 +131,15 @@ async function logout() {
   top: 100%;
   min-width: 200px;
   padding: var(--space-2) 0;
-  background: rgba(0, 0, 0, 0.92);
-  border: 1px solid #333;
+  background: var(--color-menu-bg);
+  border: 1px solid var(--color-divider);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
 }
 .menu-name {
   padding: var(--space-2) var(--space-4);
   font-weight: 700;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--color-divider);
   margin-bottom: var(--space-1);
 }
 .menu-item {
@@ -154,8 +159,9 @@ async function logout() {
 .menu-sep {
   margin: var(--space-1) 0;
   border: 0;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--color-divider);
 }
+.with-icon,
 .logout {
   display: flex;
   align-items: center;

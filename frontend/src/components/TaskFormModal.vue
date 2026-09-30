@@ -343,7 +343,7 @@ async function submit() {
 }
 .private.on .switch::after {
   transform: translateX(18px);
-  background: #fff;
+  background: var(--color-on-accent);
 }
 .private input:focus-visible + .switch {
   outline: 2px solid var(--color-text);
