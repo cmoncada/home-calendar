@@ -94,7 +94,7 @@ onMounted(() => {
         v-for="o in items"
         :key="`${o.taskId}-${o.date}`"
         class="item"
-        :class="{ done: o.completed }"
+        :class="{ done: o.completed, foreign: !auth.isMyTask(o.task) }"
         :style="{ '--c': o.task.color }"
       >
         <label class="check">
@@ -104,11 +104,12 @@ onMounted(() => {
         </label>
 
         <div class="info">
-          <span v-if="category(o) || o.task.isPrivate" class="tags">
+          <span v-if="category(o) || o.task.isPrivate || !auth.isMyTask(o.task)" class="tags">
             <span v-if="category(o)" class="category" :style="{ '--cc': category(o).color }">
               {{ category(o).icon }} {{ category(o).name }}
             </span>
             <span v-if="o.task.isPrivate" class="private-tag">🔒 Privada</span>
+            <span v-if="!auth.isMyTask(o.task)" class="private-tag">👥 De otro miembro</span>
           </span>
           <h2>{{ o.task.title }}</h2>
           <p class="meta">
@@ -216,6 +217,15 @@ h1 {
 }
 .item.done {
   opacity: 0.6;
+}
+/* Tareas que no son del usuario: fondo hundido y borde discontinuo */
+.item.foreign {
+  background: var(--color-bg-sunken);
+  border-style: dashed;
+  border-left-style: solid;
+}
+.item.foreign h2 {
+  color: var(--color-text-muted);
 }
 .item.done h2 {
   text-decoration: line-through;
