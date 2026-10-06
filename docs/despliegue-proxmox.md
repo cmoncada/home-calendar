@@ -245,11 +245,46 @@ Dentro de la red de casa la app funciona por HTTP sin cambios. Para usarla desde
 - Guarda en `./backups/` la base de datos (`db-FECHA.sql.gz`) y las fotos (`uploads-FECHA.tar.gz`).
 - Borra los backups de más de 14 días (configurable con `KEEP_DAYS`).
 - Las contraseñas se leen dentro del contenedor, nunca en la línea de comandos.
+- Si se lanzan dos a la vez (manual y programado), el segundo espera a que termine el primero.
 
-**Automático cada día a las 3:00.** Abre el cron con `crontab -e` y añade:
+### Backup semanal automático (recomendado)
+
+Un solo comando deja programado el backup con un timer de systemd:
+
+```bash
+sudo ./scripts/install-backup-timer.sh
+```
+
+- Por defecto se ejecuta **cada domingo a las 3:00** y conserva **8 semanas** de copias.
+- Si la VM estaba apagada a esa hora, el backup se hace en cuanto vuelve a arrancar.
+- Se puede volver a ejecutar para cambiar la configuración; reemplaza la anterior.
+
+| Opción | Para qué sirve | Por defecto |
+|---|---|---|
+| `--day lun…dom` | Día de la semana (también `mon…sun`) | `dom` |
+| `--time HH:MM` | Hora (zona horaria de la VM) | `03:00` |
+| `--keep-weeks N` | Semanas de copias que se conservan | `8` |
+| `--dir /ruta` | Carpeta de destino, p. ej. un NAS montado | `./backups` |
+
+Ejemplo: miércoles a las 22:30, conservando 12 semanas en un NAS:
+
+```bash
+sudo ./scripts/install-backup-timer.sh --day mie --time 22:30 --keep-weeks 12 --dir /mnt/nas/home-calendar
+```
+
+| Acción | Comando |
+|---|---|
+| Hacer un backup ahora (para probar) | `sudo ./scripts/install-backup-timer.sh --run-now` |
+| Ver la próxima ejecución y los últimos logs | `sudo ./scripts/install-backup-timer.sh --status` |
+| Logs completos | `journalctl -u home-calendar-backup.service` |
+| Desinstalar (no borra los backups) | `sudo ./scripts/install-backup-timer.sh --uninstall` |
+
+> El backup programado se ejecuta como el usuario dueño de la carpeta del proyecto (debe estar en el grupo `docker`, como en el paso 4), así que los ficheros quedan a su nombre y puedes restaurarlos sin `sudo`.
+
+**Alternativa con cron** (si prefieres no usar systemd), por ejemplo cada domingo a las 3:00. Abre `crontab -e` y añade:
 
 ```
-0 3 * * * /opt/home-calendar/scripts/backup-db.sh >> $HOME/home-calendar-backup.log 2>&1
+0 3 * * 0 KEEP_DAYS=56 /opt/home-calendar/scripts/backup-db.sh >> $HOME/home-calendar-backup.log 2>&1
 ```
 
 **Restaurar** (reemplaza los datos actuales y pide confirmación):
@@ -305,5 +340,5 @@ Dentro de la red de casa la app funciona por HTTP sin cambios. Para usarla desde
 - [ ] `./scripts/setup-env.sh` ejecutado y `.env.prod` guardado en un lugar seguro
 - [ ] `./scripts/deploy.sh` terminado con "✔ Home Calendar desplegado"
 - [ ] Login como admin y perfiles creados
-- [ ] Cron de backups configurado y backup de la VM en Proxmox
+- [ ] Backup semanal programado (`sudo ./scripts/install-backup-timer.sh`) y backup de la VM en Proxmox
 - [ ] Token del ESP32 generado (cuando llegue el dispositivo)

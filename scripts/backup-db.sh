@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 # Copia de seguridad de la BD y de las fotos de perfil.
 # Uso: ./scripts/backup-db.sh            (guarda en ./backups, conserva 14 días)
-# Cron diario a las 3:00:
-#   0 3 * * * /opt/home-calendar/scripts/backup-db.sh >> $HOME/home-calendar-backup.log 2>&1
+# Variables: BACKUP_DIR (destino), KEEP_DAYS (días que se conservan).
+# Para programarlo cada semana: sudo ./scripts/install-backup-timer.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 BACKUP_DIR=${BACKUP_DIR:-./backups}
 KEEP_DAYS=${KEEP_DAYS:-14}
-STAMP=$(date +%Y%m%d-%H%M%S)
 mkdir -p "$BACKUP_DIR"
 chmod 700 "$BACKUP_DIR"
+
+# Evita dos backups a la vez (p. ej. uno manual mientras corre el programado): el segundo espera
+if command -v flock >/dev/null; then
+  exec 9>"$BACKUP_DIR/.lock"
+  flock 9
+fi
+STAMP=$(date +%Y%m%d-%H%M%S)
 
 COMPOSE=(docker compose -f docker-compose.prod.yml --env-file .env.prod)
 

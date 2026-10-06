@@ -9,7 +9,7 @@ Calendario de tareas del hogar. Backend Node.js 24 + Express 5 + MySQL 8.4, fron
 - Build del frontend: `pnpm build`
 - Limpiar BD de dev: `pnpm db:clean` (solo tareas) / `pnpm db:reset` (todo; recrea Admin y Pantalla). Ambos aceptan `--yes`.
 - Login de dev: Admin / `admin12345` (de `.env` / defaults de `docker-compose.dev.yml`).
-- Producción: `scripts/setup-env.sh`, `scripts/deploy.sh`, `scripts/backup-db.sh`, `scripts/restore-db.sh`, `scripts/check-host.sh`.
+- Producción: `scripts/setup-env.sh`, `scripts/deploy.sh`, `scripts/backup-db.sh`, `scripts/install-backup-timer.sh` (backup semanal con systemd), `scripts/restore-db.sh`, `scripts/check-host.sh`.
 
 Antes de dar algo por terminado: `pnpm test`, `pnpm build` y comprobarlo en el navegador (http://localhost:5173), incluido móvil (375 px) y **ambos temas** si toca UI.
 
