@@ -15,7 +15,8 @@ Antes de dar algo por terminado: `pnpm test`, `pnpm build` y comprobarlo en el n
 
 ## Convenciones
 
-- **Idioma**: rutas de API y del frontend en **inglés** (`/api/tasks`, `/day/:date`, `/profiles/new`); textos de UI, comentarios, mensajes de error y commits en **español**.
+- **Idioma**: rutas de API y del frontend en **inglés** (`/api/tasks`, `/day/:date`, `/profiles/new`); textos de UI, comentarios y mensajes de error en **español**.
+- **Commits en inglés**: todos los mensajes de commit (título y cuerpo) y los títulos/descripciones de PR se escriben en **inglés**, en modo imperativo (`Add weekly backup timer`). Los commits antiguos en español se dejan como están.
 - **CSS puro**: nada de Tailwind ni librerías de UI/gráficas (la gráfica del dashboard es SVG propio). Todos los colores son variables de `frontend/src/styles/tokens.css`, con paleta oscura (por defecto) y clara (`:root[data-theme='light']`). No escribir colores fijos en componentes; añadir un token para ambos temas.
 - **BD**: cambios de esquema solo con una migración nueva numerada en `backend/migrations/NNN_nombre.sql` (nunca editar las aplicadas). Usar `query()` de `src/db.js` (`pool.query`, admite `IN (?)` con arrays) y `withTransaction`.
 - **Validación** con zod (`backend/src/validation.js`); errores con `HttpError` → `{ error: "mensaje en español" }`.
