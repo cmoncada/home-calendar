@@ -175,6 +175,15 @@ void fetchToday() {
 }
 ```
 
+## Convenciones
+
+- **Commits y pull requests en inglés**, en modo imperativo (p. ej. `Add weekly backup timer`).
+- Rutas de la API y del frontend en inglés; textos de la interfaz, comentarios y mensajes de error en español.
+- CSS puro con variables de `frontend/src/styles/tokens.css` (tema oscuro y claro); sin frameworks de CSS.
+- Cambios de esquema de BD solo con migraciones nuevas numeradas en `backend/migrations/`.
+
+Más detalle en [CLAUDE.md](CLAUDE.md).
+
 ## Estructura
 
 ```
