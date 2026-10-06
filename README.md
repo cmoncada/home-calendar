@@ -118,6 +118,7 @@ Resumen, en la VM (con Docker instalado y el proyecto en `/opt/home-calendar`):
 | `scripts/check-host.sh` | Comprueba CPU, RAM, disco, Docker, `.env.prod` y puerto (lo usa `deploy.sh`) |
 | `scripts/deploy.sh` | Instala o actualiza: `git pull` si hay remoto, build, arranque y espera a que todo esté sano |
 | `scripts/backup-db.sh` | Backup de la BD y las fotos en `./backups` (conserva 14 días) |
+| `scripts/install-backup-timer.sh` | Programa el backup semanal automático (timer de systemd, `sudo`) |
 | `scripts/restore-db.sh` | Restaura un backup |
 
 En producción la API no arranca si `.env.prod` tiene secretos de ejemplo, un `JWT_SECRET` corto o una zona horaria inválida.
