@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-12",
+  "weekday": "Lunes",
+  "now": "12:00",
+  "total": 8,
+  "pending": 7,
+  "tasks": [
+    {
+      "id": 900,
+      "t": "Franja ROJO puro #ff0000",
+      "cat": "Prueba",
+      "time": "08:00",
+      "end": "09:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#ff0000"
+    },
+    {
+      "id": 901,
+      "t": "Franja VERDE puro #00ff00",
+      "cat": "Prueba",
+      "time": "09:00",
+      "end": "10:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#00ff00"
+    },
+    {
+      "id": 902,
+      "t": "Franja AZUL puro #0000ff",
+      "cat": "Prueba",
+      "time": "10:00",
+      "end": "11:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#0000ff"
+    },
+    {
+      "id": 903,
+      "t": "Franja AMARILLO #ffff00",
+      "cat": "Prueba",
+      "time": "11:00",
+      "end": "12:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": true,
+      "color": "#ffff00"
+    },
+    {
+      "id": 904,
+      "t": "Franja BLANCO #ffffff",
+      "cat": "Prueba",
+      "time": "12:00",
+      "end": "13:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#ffffff"
+    },
+    {
+      "id": 905,
+      "t": "Franja CIAN #00ffff",
+      "cat": "Prueba",
+      "time": "13:00",
+      "end": "14:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#00ffff"
+    },
+    {
+      "id": 906,
+      "t": "Franja MAGENTA #ff00ff",
+      "cat": "Prueba",
+      "time": "14:00",
+      "end": "15:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#ff00ff"
+    },
+    {
+      "id": 907,
+      "t": "Franja Rojo Netflix #e50914",
+      "cat": "Prueba",
+      "time": "15:00",
+      "end": "16:00",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": false,
+      "color": "#e50914"
+    }
+  ]
+}

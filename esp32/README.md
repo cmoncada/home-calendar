@@ -113,6 +113,7 @@ cd esp32
 | `03-textos-largos.json` | Títulos largos, ñ y tildes, 4 responsables, tareas sin hora, cruce de medianoche |
 | `04-todo-hecho.json` | Todo completado (LED verde, tachados) |
 | `05-vacio.json` | Día sin tareas |
+| `06-prueba-colores.json` | Franjas rojo, verde, azul, amarillo, blanco, cian y magenta: el título dice el color esperado |
 
 También acepta comandos para ver otras pantallas:
 
@@ -188,7 +189,9 @@ Cuando funcione, cambia la URL a la de la VM de producción (BOOT 3 s) y usa un 
 
 | Síntoma | Solución |
 |---|---|
-| Pantalla en blanco o con colores raros | Algunas placas necesitan otro driver: en `platformio.ini`, cambia `-DILI9341_2_DRIVER` por `-DILI9341_DRIVER` en `env:cyd`. Si los colores salen invertidos, añade `-DTFT_INVERSION_ON`. |
+| Colores invertidos (fondo blanco, rojo→cian, verde→morado, azul→amarillo) | Envía `samples/06-prueba-colores.json` para comprobarlo. Si están invertidos, cambia en `env:cyd` de `platformio.ini` `-DTFT_INVERSION_ON=1` por `-DTFT_INVERSION_OFF=1` (o al revés). La placa de este proyecto necesita `ON`. |
+| Rojo y azul intercambiados (el verde bien) | Añade `-DTFT_RGB_ORDER=TFT_BGR` en `env:cyd`. |
+| Pantalla en blanco | Algunas placas necesitan otro driver: en `env:cyd` cambia `-DILI9341_2_DRIVER` por `-DILI9341_DRIVER`. |
 | No aparece el puerto al subir | Prueba otro cable (de datos) o puerto. Mantén BOOT pulsado al empezar la subida si se queda en "Connecting…". |
 | "Token no válido" | El token se revocó o es de otro servidor (dev o prod). Genera uno nuevo y cámbialo con BOOT 3 s. |
 | "Sin conexión" | Comprueba la URL con curl desde otro equipo de la misma red. En dev, el puerto es `:3000`; en producción, `:80`. |
