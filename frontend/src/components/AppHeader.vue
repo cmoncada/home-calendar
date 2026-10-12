@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.js';
 import { useTasksStore } from '../stores/tasks.js';
 import { theme, toggleTheme } from '../utils/theme.js';
+import iconDark from '../images/icon_dark.svg';
+import iconLight from '../images/icon_light.svg';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -20,8 +22,9 @@ async function logout() {
 
 <template>
   <header class="header">
-    <RouterLink to="/" class="brand">
-      <span class="logo">HOME</span><span class="logo-sub">calendar</span>
+    <RouterLink to="/" class="brand" aria-label="Home Calendar: ir al calendario">
+      <!-- Icono claro sobre fondo oscuro y viceversa -->
+      <img class="logo" :src="theme === 'dark' ? iconDark : iconLight" alt="Home Calendar" width="36" height="36" />
     </RouterLink>
 
     <nav class="nav">
@@ -74,19 +77,17 @@ async function logout() {
 }
 .brand {
   display: flex;
-  align-items: baseline;
-  gap: 2px;
+  align-items: center;
+  flex-shrink: 0;
   text-decoration: none;
 }
 .logo {
-  color: var(--color-accent);
-  font-weight: 900;
-  font-size: 1.5rem;
-  letter-spacing: -0.02em;
+  width: 36px;
+  height: 36px;
+  transition: transform var(--transition);
 }
-.logo-sub {
-  font-size: var(--fs-sm);
-  color: var(--color-text-muted);
+.brand:hover .logo {
+  transform: scale(1.06);
 }
 .nav {
   display: flex;
@@ -171,8 +172,9 @@ async function logout() {
   .header {
     gap: var(--space-3);
   }
-  .logo-sub {
-    display: none;
+  .logo {
+    width: 32px;
+    height: 32px;
   }
   .nav {
     gap: var(--space-3);
