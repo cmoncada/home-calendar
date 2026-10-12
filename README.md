@@ -125,6 +125,8 @@ En producción la API no arranca si `.env.prod` tiene secretos de ejemplo, un `J
 
 ## ESP32
 
+📟 **Firmware listo para la Cheap Yellow Display (PlatformIO): [esp32/README.md](esp32/README.md)**. Incluye portal WiFi, táctil, LED de estado, brillo automático y simulación con Wokwi.
+
 1. Entra como administrador → **Administrar** → *Pantalla ESP32* → **Generar token** (se muestra una sola vez).
 2. El dispositivo consulta:
 

@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-13",
+  "weekday": "Martes",
+  "now": "21:47",
+  "total": 5,
+  "pending": 4,
+  "tasks": [
+    {
+      "id": 201,
+      "t": "Revisar la caldera, purgar todos los radiadores y anotar la presión del circuito",
+      "cat": "Mantenimiento",
+      "time": "09:00",
+      "end": "12:00",
+      "dur": "3h",
+      "who": [
+        "Luis",
+        "Ana",
+        "Martín",
+        "Sofía"
+      ],
+      "done": false,
+      "color": "#ff7a00"
+    },
+    {
+      "id": 202,
+      "t": "Añadir sal al descalcificador y comprobar el caño del jardín",
+      "cat": "Mantenimiento",
+      "time": null,
+      "end": null,
+      "dur": "1d",
+      "who": [
+        "Begoña"
+      ],
+      "done": false,
+      "color": "#0071eb"
+    },
+    {
+      "id": 203,
+      "t": "Ñandú, pingüino, acción: ¿caracteres raros?",
+      "cat": "Recordatorios",
+      "time": "10:15",
+      "end": "10:45",
+      "dur": "1h",
+      "who": [
+        "José María",
+        "Íñigo"
+      ],
+      "done": true,
+      "color": "#f5c518"
+    },
+    {
+      "id": 204,
+      "t": "Pagar el IBI del ayuntamiento antes de que termine el plazo de pago voluntario",
+      "cat": "Pagos",
+      "time": "23:00",
+      "end": "02:00",
+      "dur": "3h",
+      "who": [
+        "Luis"
+      ],
+      "done": false,
+      "color": "#2ecc71"
+    },
+    {
+      "id": 205,
+      "t": "Vacaciones: preparar maletas (continúa desde ayer)",
+      "cat": "Recordatorios",
+      "time": null,
+      "end": null,
+      "dur": "3d",
+      "who": [],
+      "done": false,
+      "color": "#ff4f9a"
+    }
+  ]
+}
