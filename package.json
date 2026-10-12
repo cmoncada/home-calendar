@@ -9,6 +9,7 @@
     "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
     "docker:prod": "docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build",
     "db:clean": "docker compose -f docker-compose.dev.yml exec backend node src/scripts/db-clean.js tasks",
-    "db:reset": "docker compose -f docker-compose.dev.yml exec backend node src/scripts/db-clean.js all"
+    "db:reset": "docker compose -f docker-compose.dev.yml exec backend node src/scripts/db-clean.js all",
+    "icons": "node frontend/scripts/generate-pwa-icons.mjs"
   }
 }

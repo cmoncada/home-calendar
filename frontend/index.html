@@ -4,8 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141414" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content="Calendario de tareas del hogar" />
     <title>Home Calendar</title>
+
+    <!-- Iconos: SVG adaptativo (claro/oscuro según el sistema) con PNG de respaldo -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <!-- PWA: instalable en Android, iOS y escritorio -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Calendario" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <script>
       // Aplica el tema guardado antes de pintar la página (evita un destello del tema equivocado)
       try {

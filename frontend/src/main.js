@@ -17,3 +17,11 @@ setUnauthorizedHandler(() => {
 });
 
 app.mount('#app');
+
+// PWA: el service worker solo en producción (en desarrollo interferiría con la recarga de Vite).
+// Los navegadores solo lo permiten en HTTPS o en localhost.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => console.warn('Service worker no registrado:', err.message));
+  });
+}
