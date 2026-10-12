@@ -1,0 +1,168 @@
+{
+  "date": "2026-10-12",
+  "weekday": "Lunes",
+  "now": "08:15",
+  "total": 13,
+  "pending": 9,
+  "tasks": [
+    {
+      "id": 100,
+      "t": "Barrer la cocina",
+      "cat": "Limpieza",
+      "time": "07:00",
+      "end": "07:30",
+      "dur": "1h",
+      "who": [],
+      "done": true,
+      "color": "#00b8a9"
+    },
+    {
+      "id": 101,
+      "t": "Cambiar filtro del aire",
+      "cat": "Mantenimiento",
+      "time": "08:00",
+      "end": "08:30",
+      "dur": "1h",
+      "who": [
+        "Luis"
+      ],
+      "done": false,
+      "color": "#ff7a00"
+    },
+    {
+      "id": 102,
+      "t": "Pagar internet",
+      "cat": "Pagos",
+      "time": "09:00",
+      "end": "09:30",
+      "dur": "1h",
+      "who": [
+        "Martín"
+      ],
+      "done": false,
+      "color": "#2ecc71"
+    },
+    {
+      "id": 103,
+      "t": "Sacar al perro",
+      "cat": "Recordatorios",
+      "time": "10:00",
+      "end": "10:30",
+      "dur": "1h",
+      "who": [],
+      "done": false,
+      "color": "#f5c518"
+    },
+    {
+      "id": 104,
+      "t": "Lavar la ropa",
+      "cat": null,
+      "time": "11:00",
+      "end": "11:30",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": true,
+      "color": "#9b59b6"
+    },
+    {
+      "id": 105,
+      "t": "Comprar pan",
+      "cat": "Limpieza",
+      "time": "12:00",
+      "end": "12:30",
+      "dur": "1h",
+      "who": [
+        "Luis"
+      ],
+      "done": false,
+      "color": "#00b8a9"
+    },
+    {
+      "id": 106,
+      "t": "Revisar el buzón",
+      "cat": "Mantenimiento",
+      "time": "13:00",
+      "end": "13:30",
+      "dur": "1h",
+      "who": [],
+      "done": false,
+      "color": "#ff7a00"
+    },
+    {
+      "id": 107,
+      "t": "Tender la ropa",
+      "cat": "Pagos",
+      "time": "14:00",
+      "end": "14:30",
+      "dur": "1h",
+      "who": [
+        "Sofía"
+      ],
+      "done": false,
+      "color": "#2ecc71"
+    },
+    {
+      "id": 108,
+      "t": "Limpiar el baño",
+      "cat": "Recordatorios",
+      "time": "15:00",
+      "end": "15:30",
+      "dur": "1h",
+      "who": [
+        "Ana"
+      ],
+      "done": true,
+      "color": "#f5c518"
+    },
+    {
+      "id": 109,
+      "t": "Regar el huerto",
+      "cat": null,
+      "time": "16:00",
+      "end": "16:30",
+      "dur": "1h",
+      "who": [],
+      "done": false,
+      "color": "#9b59b6"
+    },
+    {
+      "id": 110,
+      "t": "Pagar la comunidad",
+      "cat": "Limpieza",
+      "time": "17:00",
+      "end": "17:30",
+      "dur": "1h",
+      "who": [
+        "Martín"
+      ],
+      "done": false,
+      "color": "#00b8a9"
+    },
+    {
+      "id": 111,
+      "t": "Cita del dentista",
+      "cat": "Mantenimiento",
+      "time": "18:00",
+      "end": "18:30",
+      "dur": "1h",
+      "who": [
+        "Sofía"
+      ],
+      "done": false,
+      "color": "#ff7a00"
+    },
+    {
+      "id": 112,
+      "t": "Fregar los platos",
+      "cat": "Pagos",
+      "time": "19:00",
+      "end": "19:30",
+      "dur": "1h",
+      "who": [],
+      "done": true,
+      "color": "#2ecc71"
+    }
+  ]
+}

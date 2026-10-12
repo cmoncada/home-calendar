@@ -3,6 +3,7 @@
 // Muestra las tareas del día de GET /api/display/today. Táctil: ‹ › cambia de día,
 // tocar la lista o deslizar pasa de página. BOOT 3 s = abrir el portal de configuración.
 // Mantener BOOT o la pantalla pulsados 5 s al encender = borrar WiFi, URL y token.
+// Vista previa: por el USB se puede enviar un JSON (tools/send_json.py) y se dibuja tal cual.
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -56,6 +57,13 @@ uint32_t lastFooterMs = 0;
 uint32_t bootPressedMs = 0;
 bool fatalShown = false;   // hay un mensaje a pantalla completa (token inválido, etc.)
 
+// Vista previa por USB: mientras dura no se piden datos al servidor
+constexpr uint32_t kPreviewMs = 10 * 60 * 1000;
+constexpr size_t kMaxSerialLine = 24 * 1024;
+bool preview = false;
+uint32_t previewUntil = 0;
+String serialLine;
+
 int pages() {
   return agenda::pageCount(static_cast<int>(day.tasks.size()), ui::kRowsPerPage);
 }
@@ -66,12 +74,13 @@ bool viewingToday() {
 
 String footerText(bool& alert) {
   alert = false;
-  if (kUseMock) return "Datos de ejemplo";
   if (lastStatus != FetchStatus::Ok && hasData) {
     alert = true;
     const uint32_t mins = (millis() - lastOkMs) / 60000;
     return mins ? "Sin conexión · hace " + String(mins) + " min" : "Sin conexión · reintentando";
   }
+  if (preview) return "Vista previa (USB)";
+  if (kUseMock) return "Datos de ejemplo";
   return day.now.empty() ? String("") : "Act. " + String(day.now.c_str());
 }
 
@@ -141,6 +150,10 @@ void fetch() {
 }
 
 void goToDay(int delta) {
+  if (preview) {
+    Serial.println("Vista previa: el cambio de día no aplica (envía otro JSON o :live)");
+    return;
+  }
   const std::string base = hasData ? day.date : std::string(todayDate.c_str());
   if (base.empty()) return;
   const String target = agenda::addDays(base, delta).c_str();
@@ -174,6 +187,98 @@ void handleTouch() {
           render();
         }
         break;
+    }
+  }
+}
+
+// ---------- Vista previa por USB ----------
+
+void startPreview() {
+  preview = true;
+  previewUntil = millis() + kPreviewMs;
+  lastTouchMs = millis();
+}
+
+void endPreview() {
+  preview = false;
+  lastStatus = FetchStatus::Ok;
+  hasData = false;
+  lastHash = 0;
+  page = 0;
+  viewDate = "";
+  if (portal::active()) {
+    ui::drawPortal(portal::kApName, portal::kApPassword, WiFi.softAPIP().toString());
+  } else {
+    fetchNow = true;
+  }
+}
+
+/**
+ * Una línea recibida por el USB:
+ *   {...}     JSON con el formato de /api/display/today → se dibuja
+ *   :portal   pantalla del portal de configuración
+ *   :token    pantalla de "Token no válido"
+ *   :offline  el JSON actual con el aviso de "Sin conexión"
+ *   :live     salir de la vista previa
+ */
+void processSerialLine(String line) {
+  line.trim();
+  if (!line.length()) return;
+  if (line[0] == '{') {
+    agenda::Day parsed;
+    std::string error;
+    if (!agenda::parseDay(line.c_str(), line.length(), parsed, &error)) {
+      Serial.printf("PREVIEW ERROR JSON no válido: %s\n", error.c_str());
+      return;
+    }
+    day = std::move(parsed);
+    hasData = true;
+    lastStatus = FetchStatus::Ok;
+    if (todayDate.isEmpty()) todayDate = day.date.c_str();
+    viewDate = todayDate == day.date.c_str() ? String("") : String(day.date.c_str());
+    page = 0;
+    startPreview();
+    render();
+    light::setLed(day.pending == 0 ? LedState::AllDone : LedState::Pending);
+    Serial.printf("PREVIEW OK %u tareas, %d páginas\n", static_cast<unsigned>(day.tasks.size()), pages());
+  } else if (line == ":portal") {
+    startPreview();
+    ui::drawPortal(portal::kApName, portal::kApPassword, "192.168.4.1");
+    Serial.println("PREVIEW OK portal");
+  } else if (line == ":token") {
+    startPreview();
+    ui::drawMessage("Token no válido",
+                    "Genera uno nuevo en Administrar > Pantalla ESP32\ny mantén pulsado BOOT 3 s para cambiarlo.",
+                    ui::color::kDanger);
+    light::setLed(LedState::Error);
+    Serial.println("PREVIEW OK token");
+  } else if (line == ":offline") {
+    if (!hasData) {
+      Serial.println("PREVIEW ERROR envía antes un JSON");
+      return;
+    }
+    startPreview();
+    lastStatus = FetchStatus::NetworkError;
+    lastOkMs = millis() - 5 * 60000;
+    render();
+    light::setLed(LedState::Offline);
+    Serial.println("PREVIEW OK offline");
+  } else if (line == ":live") {
+    endPreview();
+    Serial.println("PREVIEW OFF");
+  } else {
+    Serial.println("PREVIEW ERROR comando desconocido (JSON, :portal, :token, :offline o :live)");
+  }
+}
+
+void handleSerial() {
+  while (Serial.available()) {
+    const char c = static_cast<char>(Serial.read());
+    if (c == '\n') {
+      processSerialLine(serialLine);
+      serialLine = "";
+    } else if (c != '\r' && serialLine.length() < kMaxSerialLine) {
+      serialLine += c;
     }
   }
 }
@@ -227,7 +332,9 @@ bool connectWifi() {
 }  // namespace
 
 void setup() {
+  Serial.setRxBufferSize(8192);  // JSON de vista previa por USB
   Serial.begin(115200);
+  serialLine.reserve(1024);
   Serial.println("\nHome Calendar · pantalla ESP32");
   pinMode(board::kBootButton, INPUT_PULLUP);
   light::begin();
@@ -253,10 +360,14 @@ void setup() {
 
 void loop() {
   light::update();
+  handleSerial();
+  if (preview && static_cast<int32_t>(millis() - previewUntil) >= 0) endPreview();
   checkBootButton();
 
   if (portal::active()) {
+    if (preview) handleTouch();  // permite pasar páginas de la vista previa
     if (portal::process(cfg)) {
+      preview = false;
       Serial.println("Portal cerrado: configuración lista");
       hasData = false;
       fetchNow = true;
@@ -266,12 +377,12 @@ void loop() {
   }
 
   const uint32_t now = millis();
-  if (fetchNow || static_cast<int32_t>(now - nextFetchMs) >= 0) fetch();
+  if (!preview && (fetchNow || static_cast<int32_t>(now - nextFetchMs) >= 0)) fetch();
 
   handleTouch();
 
   // Sin tocar nada durante un rato: volver a hoy y a la primera página
-  if ((!viewingToday() || page != 0) && now - lastTouchMs > kIdleBackToTodayMs) {
+  if (!preview && (!viewingToday() || page != 0) && now - lastTouchMs > kIdleBackToTodayMs) {
     viewDate = "";
     page = 0;
     fetchNow = true;

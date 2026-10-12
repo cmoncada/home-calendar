@@ -223,21 +223,29 @@ void drawPortal(const char* apName, const char* apPassword, const String& ip) {
   u8f.begin(tft);
   tft.fillScreen(kBg);
   tft.fillRect(0, 0, board::kScreenW, 6, kInfo);
-  centered(36, "Configurar pantalla", kFontMessage, kText);
-  const int x = 18;
-  int y = 72;
+  centered(34, "Configurar pantalla", kFontMessage, kText);
+  // Cada paso: explicación en una línea y, debajo, el dato a escribir en negrita.
+  // Así un nombre de red o una IP largos nunca se salen de la pantalla.
+  const int x = 14;
+  const int textX = x + 26;
+  const int maxW = board::kScreenW - textX - 8;
+  int y = 62;
   const auto step = [&](const char* n, const std::string& line, const std::string& strong) {
     tft.fillCircle(x + 8, y - 5, 9, kInfo);
     text(x + 5, y - 1, n, kFontSmall, kText);
-    text(x + 26, y, line, kFontBody, kMuted);
-    if (!strong.empty()) text(x + 26 + width(line, kFontBody) + 4, y, strong, kFontRowTitle, kText);
-    y += 30;
+    text(textX, y, fit(line, kFontBody, maxW), kFontBody, kMuted);
+    if (!strong.empty()) {
+      text(textX, y + 17, fit(strong, kFontRowTitle, maxW), kFontRowTitle, kText);
+      y += 40;
+    } else {
+      y += 24;
+    }
   };
-  step("1", "Conéctate a la WiFi", apName);
+  step("1", "Conéctate a la WiFi:", apName);
   step("2", "Contraseña:", apPassword);
-  step("3", "Si no se abre solo, entra en", ip.c_str());
-  step("4", "Elige tu WiFi, URL y token", "");
-  centered(222, "El token se genera en Administrar > Pantalla ESP32", kFontSmall, kFaint);
+  step("3", "Si no se abre sola la página, entra en:", ("http://" + ip).c_str());
+  step("4", "Elige tu WiFi y pon la URL y el token", "");
+  centered(230, "El token se genera en Administrar > Pantalla ESP32", kFontSmall, kFaint);
 }
 
 Zone hit(int x, int y) {

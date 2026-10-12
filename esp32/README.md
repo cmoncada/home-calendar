@@ -73,7 +73,7 @@ La URL se normaliza sola: puedes pegar `192.168.1.50`, `http://192.168.1.50/` o 
 
 ## 3. Cómo simular y probar la recepción de datos
 
-Hay cuatro niveles, de menos a más real.
+Hay cinco niveles, de menos a más real.
 
 ### a) Tests de la lógica en el Mac (sin hardware)
 
@@ -96,7 +96,46 @@ Prueban `lib/agenda`:
 
 Usa el JSON de `lib/agenda/mock_today.h` (7 tareas, 2 páginas). Es ideal para ver el diseño y probar el táctil, el LED y el brillo.
 
-### c) Simulador Wokwi en VS Code (sin placa)
+### c) Vista previa por USB: enviar un JSON a la placa
+
+Con la placa conectada al Mac, puedes mandarle cualquier JSON con el formato de `/api/display/today` y la dibuja al momento. No hace falta WiFi, servidor ni recompilar, y funciona incluso con el portal de configuración abierto.
+
+```bash
+cd esp32
+~/.platformio/penv/bin/python tools/send_json.py samples/02-muchas-tareas.json
+~/.platformio/penv/bin/python tools/send_json.py samples/*.json --pause 5   # todos, uno cada 5 s
+```
+
+| Ejemplo (`samples/`) | Qué revisa |
+|---|---|
+| `01-normal.json` | Un día típico (7 tareas, 2 páginas) |
+| `02-muchas-tareas.json` | 13 tareas → 4 páginas, puntos de paginación |
+| `03-textos-largos.json` | Títulos largos, ñ y tildes, 4 responsables, tareas sin hora, cruce de medianoche |
+| `04-todo-hecho.json` | Todo completado (LED verde, tachados) |
+| `05-vacio.json` | Día sin tareas |
+
+También acepta comandos para ver otras pantallas:
+
+| Comando | Pantalla |
+|---|---|
+| `:portal` | El portal WiFi |
+| `:token` | "Token no válido" |
+| `:offline` | El último JSON con el aviso "Sin conexión" |
+| `:live` | Vuelve a los datos reales |
+
+Con `-` lee el JSON de la entrada estándar, por ejemplo el de tu servidor:
+
+```bash
+curl -s -H "Authorization: Bearer hc_…" http://localhost:3000/api/display/today | ~/.platformio/penv/bin/python tools/send_json.py -
+```
+
+Detalles:
+- Mientras dura la vista previa (10 minutos o hasta `:live`), el pie muestra "Vista previa (USB)" y no se piden datos al servidor.
+- El táctil pasa páginas; las flechas de día no hacen nada.
+- Cierra el monitor serie antes de usar el script: el puerto USB solo admite un programa a la vez.
+- Al abrir el puerto, macOS reinicia la placa; el script lo detecta y espera unos segundos.
+
+### d) Simulador Wokwi en VS Code (sin placa)
 
 1. **Instala** la extensión **Wokwi Simulator** en VS Code y activa la licencia gratuita: F1 → *Wokwi: Request a New License*.
 2. **Compila** el entorno del simulador: `pio run -e wokwi`.
@@ -113,7 +152,7 @@ El simulador monta ESP32 + pantalla ILI9341 + LED RGB + sensor de luz. Wokwi no 
 
   El simulador se conecta a la WiFi `Wokwi-GUEST` y llama a `http://host.wokwi.internal:3000`. Ese nombre apunta a tu Mac a través del *Private IoT Gateway* que la extensión de VS Code incluye. Si en tu licencia no está disponible, la petición fallará ("Sin conexión"); en ese caso, usa los datos de ejemplo o la placa real.
 
-### d) Placa real contra el backend de desarrollo del Mac
+### e) Placa real contra el backend de desarrollo del Mac
 
 1. **Averigua la IP del Mac** con `ipconfig getifaddr en0`.
 2. **Comprueba el endpoint con curl** desde el Mac, con un token de desarrollo:
@@ -171,7 +210,9 @@ esp32/
 ├── src/touch.*           XPT2046 (o pulsadores en el simulador)
 ├── src/status_led.*      LED RGB y brillo automático
 ├── lib/agenda/           lógica pura y testeable: JSON, páginas, fechas, textos
-└── test/test_agenda/     tests Unity (pio test -e native)
+├── test/test_agenda/     tests Unity (pio test -e native)
+├── tools/send_json.py    vista previa: envía un JSON por USB a la placa
+└── samples/              JSON de ejemplo para la vista previa
 ```
 
 El firmware depende del formato de `/api/display/today` (`backend/src/routes/display.js`). Si cambia el JSON, actualiza `lib/agenda` y sus tests.
