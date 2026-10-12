@@ -9,6 +9,7 @@ Calendario de tareas del hogar. Backend Node.js 24 + Express 5 + MySQL 8.4, fron
 - Build del frontend: `pnpm build`
 - Limpiar BD de dev: `pnpm db:clean` (solo tareas) / `pnpm db:reset` (todo; recrea Admin y Pantalla). Ambos aceptan `--yes`.
 - Login de dev: Admin / `admin12345` (de `.env` / defaults de `docker-compose.dev.yml`).
+- ESP32 (`esp32/`, PlatformIO, Cheap Yellow Display): `~/.platformio/penv/bin/pio run -e cyd -t upload` (placa), `-e cyd-mock` (datos de ejemplo), `-e wokwi` (simulador) y `pio test -e native` (tests de `lib/agenda`). Ver `esp32/README.md`.
 - Producción: `scripts/setup-env.sh`, `scripts/deploy.sh`, `scripts/backup-db.sh`, `scripts/install-backup-timer.sh` (backup semanal con systemd), `scripts/restore-db.sh`, `scripts/check-host.sh`.
 
 Antes de dar algo por terminado: `pnpm test`, `pnpm build` y comprobarlo en el navegador (http://localhost:5173), incluido móvil (375 px) y **ambos temas** si toca UI.
@@ -32,6 +33,7 @@ Antes de dar algo por terminado: `pnpm test`, `pnpm build` y comprobarlo en el n
 - **Dashboard** (`/api/admin/stats`): "sin terminar" = no completada y `endDate < hoy`; "pendiente" = hoy o futura; cumplimiento = completadas / (completadas + sin terminar).
 - **Usuarios especiales**: el superusuario y "Pantalla" (rol `display`, sin login web, accede por token Bearer a `/api/display/today`) se crean en `seed.js`. Debe quedar siempre al menos un admin activo.
 - En producción la API se niega a arrancar con secretos de ejemplo (`config.js` → `validateProduction`).
+- El firmware del ESP32 depende del JSON de `/api/display/today` (`routes/display.js`): si cambia, actualizar `esp32/lib/agenda` y sus tests.
 
 ## Pruebas manuales y datos
 
