@@ -123,6 +123,26 @@ Resumen, en la VM (con Docker instalado y el proyecto en `/opt/home-calendar`):
 
 En producción la API no arranca si `.env.prod` tiene secretos de ejemplo, un `JWT_SECRET` corto o una zona horaria inválida.
 
+## App instalable (PWA)
+
+La web se puede instalar como una app en el móvil o el ordenador:
+- **Iconos:** favicon adaptativo (claro u oscuro según el sistema), icono de iOS y maskable de Android.
+- **`manifest.webmanifest`:** con el atajo "Tareas de hoy".
+- **Service worker (`frontend/public/sw.js`):** abre la app sin conexión y cachea los recursos. La API nunca se cachea.
+
+| Dispositivo | Cómo instalarla |
+|---|---|
+| iPhone | Safari → Compartir → *Añadir a pantalla de inicio* |
+| Android / Chrome | Menú → *Instalar app* (requiere **HTTPS**, ver la guía de Proxmox §10) |
+
+Los diseños de los iconos están en `frontend/src/images/` (`favicon.svg`, `apple-touch-icon.svg`). Si los cambias, regenera los PNG con:
+
+```bash
+pnpm icons
+```
+
+En desarrollo (`localhost:5173`) el service worker está desactivado para no interferir con Vite.
+
 ## ESP32
 
 📟 **Firmware listo para la Cheap Yellow Display (PlatformIO): [esp32/README.md](esp32/README.md)**. Incluye portal WiFi, táctil, LED de estado, brillo automático y simulación con Wokwi.

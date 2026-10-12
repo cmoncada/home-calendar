@@ -234,6 +234,16 @@ Dentro de la red de casa la app funciona por HTTP sin cambios. Para usarla desde
   - **No** pongas `COOKIE_SECURE=true` si sigues entrando por `http://`: las sesiones dejarían de funcionar.
   - El ESP32 puede seguir usando la IP local por HTTP.
 
+**Instalar como app (PWA).** La app ya incluye manifest, iconos y service worker:
+
+| Dispositivo | Cómo instalarla | Requisito |
+|---|---|---|
+| iPhone / iPad | Safari → Compartir → **Añadir a pantalla de inicio** | Funciona también por HTTP: se abre a pantalla completa con su icono |
+| Android / Chrome / Edge | Menú → **Instalar app** | **HTTPS** |
+
+- **El service worker solo funciona con HTTPS.** Con HTTP, Android y Chrome no ofrecen instalarla ni la abren sin conexión. Para eso usa una de las opciones anteriores con certificado (Tailscale, por ejemplo, da HTTPS con `tailscale serve`).
+- **Las actualizaciones llegan solas.** Nginx sirve `sw.js` y `manifest.webmanifest` sin caché, así que cada `deploy.sh` se aplica en la siguiente apertura de la app.
+
 ---
 
 ## 11. Copias de seguridad

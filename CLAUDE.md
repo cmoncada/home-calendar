@@ -7,6 +7,7 @@ Calendario de tareas del hogar. Backend Node.js 24 + Express 5 + MySQL 8.4, fron
 - Dev (Mac, Docker): `docker compose -f docker-compose.dev.yml up -d` → app en http://localhost:5173 (Vite, proxy de `/api` y `/media` al backend :3000). El backend recarga con `node --watch`; las migraciones se aplican al arrancar.
 - Tests (solo backend, `node:test`): `pnpm test`
 - Build del frontend: `pnpm build`
+- Iconos PWA: los SVG de diseño están en `frontend/src/images/`; `pnpm icons` regenera `frontend/public/favicon.svg` e `icons/*.png` (usa `sharp` del backend).
 - Limpiar BD de dev: `pnpm db:clean` (solo tareas) / `pnpm db:reset` (todo; recrea Admin y Pantalla). Ambos aceptan `--yes`.
 - Login de dev: Admin / `admin12345` (de `.env` / defaults de `docker-compose.dev.yml`).
 - ESP32 (`esp32/`, PlatformIO, Cheap Yellow Display): `~/.platformio/penv/bin/pio run -e cyd -t upload` (placa), `-e cyd-mock` (datos de ejemplo), `-e wokwi` (simulador) y `pio test -e native` (tests de `lib/agenda`). Ver `esp32/README.md`.
@@ -22,6 +23,7 @@ Antes de dar algo por terminado: `pnpm test`, `pnpm build` y comprobarlo en el n
 - **BD**: cambios de esquema solo con una migración nueva numerada en `backend/migrations/NNN_nombre.sql` (nunca editar las aplicadas). Usar `query()` de `src/db.js` (`pool.query`, admite `IN (?)` con arrays) y `withTransaction`.
 - **Validación** con zod (`backend/src/validation.js`); errores con `HttpError` → `{ error: "mensaje en español" }`.
 - **Fechas** como cadenas `YYYY-MM-DD` con aritmética UTC (`backend/src/services/dates.js`, `frontend/src/utils/dates.js`). "Hoy" en el servidor = `nowInZone(config.tz)` (`APP_TZ`).
+- **PWA**: `frontend/public/manifest.webmanifest` + `sw.js` (solo se registra en producción; la API nunca se cachea). Si cambias `sw.js` de forma incompatible, sube su `VERSION`. Ojo: `index.html` está montado como archivo suelto en Docker dev; si se reemplaza (p. ej. `sed -i`), reinicia el contenedor `frontend`.
 - Modales con `BaseModal.vue` (pila: Escape cierra solo el de arriba). En móvil (≤560 px) ocupan toda la pantalla.
 
 ## Reglas de negocio (no evidentes en el código)

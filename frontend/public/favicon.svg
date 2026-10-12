@@ -1,1 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="2" y="5" width="28" height="25" rx="4" fill="#e50914"/><rect x="2" y="5" width="28" height="7" rx="3" fill="#b20710"/><rect x="8" y="2" width="3" height="7" rx="1.5" fill="#fff"/><rect x="21" y="2" width="3" height="7" rx="1.5" fill="#fff"/><path d="M9 21l4 4 9-9" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <style>
+      :root {
+        --house-color: #0B1B3D;
+        --cell-muted: #94A3B8;
+        --cell-active: #007AFF;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --house-color: #FFFFFF;
+          --cell-muted: #475569;
+          --cell-active: #00F0FF;
+        }
+      }
+      .house { fill: var(--house-color); }
+      .muted { fill: var(--cell-muted); }
+      .active { fill: var(--cell-active); }
+    </style>
+  </defs>
+
+  <!-- Silueta de la casa con tejado y chimenea -->
+  <path class="house" d="M16 2.8L2.5 13.5C2 13.9 2 14.7 2.5 15.1C3 15.5 3.8 15.5 4.2 15L5 14.3V26C5 27.7 6.3 29 8 29H24C25.7 29 27 27.7 27 26V14.3L27.8 15C28.2 15.5 29 15.5 29.5 15.1C30 14.7 30 13.9 29.5 13.5L24 9.1V4.5C24 3.9 23.6 3.5 23 3.5H20.5C19.9 3.5 19.5 3.9 19.5 4.5V5.5L16 2.8Z"/>
+
+  <!-- Fila superior de la retícula de calendario -->
+  <rect class="muted" x="8.5" y="15" width="3.5" height="3.5" rx="1"/>
+  <rect class="muted" x="14.25" y="15" width="3.5" height="3.5" rx="1"/>
+  <rect class="muted" x="20" y="15" width="3.5" height="3.5" rx="1"/>
+
+  <!-- Fila inferior -->
+  <rect class="muted" x="8.5" y="20.5" width="3.5" height="3.5" rx="1"/>
+  <rect class="muted" x="14.25" y="20.5" width="3.5" height="3.5" rx="1"/>
+
+  <!-- Bloque de día activo -->
+  <rect class="active" x="20" y="20.5" width="3.5" height="3.5" rx="1"/>
+</svg>
