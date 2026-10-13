@@ -5,6 +5,9 @@ import { api } from '../api/client.js';
 import { useAuthStore } from '../stores/auth.js';
 import PasswordModal from '../components/PasswordModal.vue';
 import ThemeToggle from '../components/ThemeToggle.vue';
+import { theme } from '../utils/theme.js';
+import iconDark from '../images/icon_dark.svg';
+import iconLight from '../images/icon_light.svg';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -58,7 +61,8 @@ async function login(password) {
 <template>
   <main class="profiles">
     <header class="top">
-      <div class="brand">HOME<span>calendar</span></div>
+      <!-- Mismo icono que el header de la app: claro sobre fondo oscuro y viceversa -->
+      <img class="brand" :src="theme === 'dark' ? iconDark : iconLight" alt="Home Calendar" width="48" height="48" />
       <ThemeToggle />
     </header>
 
@@ -122,16 +126,14 @@ async function login(password) {
   }
 }
 .brand {
-  color: var(--color-accent);
-  font-weight: 900;
-  font-size: 2rem;
-  letter-spacing: -0.03em;
+  width: 48px;
+  height: 48px;
 }
-.brand span {
-  margin-left: 2px;
-  font-size: var(--fs-md);
-  font-weight: 400;
-  color: var(--color-text-muted);
+@media (max-width: 600px) {
+  .brand {
+    width: 40px;
+    height: 40px;
+  }
 }
 .who {
   flex: 1;

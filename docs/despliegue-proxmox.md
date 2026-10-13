@@ -126,15 +126,17 @@ Crea la carpeta de destino:
 sudo mkdir -p /opt/home-calendar && sudo chown $USER: /opt/home-calendar
 ```
 
-### Opción A: desde un repositorio Git (recomendado)
+### Opción A: desde GitHub (recomendado)
 
-Si subes el proyecto a un repositorio privado (GitHub, Gitea…):
+El repositorio es público, así que no hace falta iniciar sesión ni configurar claves:
 
 ```bash
-git clone git@github.com:TU_USUARIO/home-calendar.git /opt/home-calendar
+git clone https://github.com/cmoncada/home-calendar.git /opt/home-calendar
 ```
 
 Con esta opción, `deploy.sh` hace `git pull` automáticamente en cada actualización.
+
+> Los secretos nunca están en el repositorio: `.env.prod` se genera en la VM con `setup-env.sh` y está en `.gitignore`.
 
 ### Opción B: copiarlo desde el Mac con rsync
 
