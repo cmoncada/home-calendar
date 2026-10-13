@@ -100,7 +100,7 @@ Conéctate por SSH a la VM y ejecuta:
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y qemu-guest-agent git curl openssl
+sudo apt install -y qemu-guest-agent git curl openssl avahi-daemon
 sudo systemctl enable --now qemu-guest-agent
 
 # Docker Engine + plugin Compose
@@ -209,6 +209,25 @@ Qué hace:
    GET http://IP-DE-LA-VM/api/display/today
    Authorization: Bearer <token>
    ```
+
+---
+
+### Nombre amigable en lugar de la IP
+
+`avahi-daemon` (instalado en el paso 4) anuncia la VM en la red local por mDNS. Así la app se abre en **`http://NOMBRE-DE-LA-VM.local`** (por ejemplo `http://home-calendar.local`) en lugar de la IP.
+
+- **Cambiar el nombre** (ejemplo: `calendario.local`):
+
+  ```bash
+  sudo hostnamectl set-hostname calendario && sudo systemctl restart avahi-daemon
+  ```
+
+- **Compatibilidad:**
+  - funciona en Mac, iPhone, iPad y Windows 10/11;
+  - en Android depende de la versión y del navegador: si no abre, usa la IP;
+  - **el ESP32 debe seguir usando la IP** (su cliente HTTP no resuelve nombres `.local`).
+- **Comprobarlo** desde el Mac: `ping -c 1 home-calendar.local`.
+- **Si ya instalaste la PWA con la IP**, bórrala y vuelve a añadirla desde la dirección `.local`: la sesión va ligada a la dirección.
 
 ---
 
