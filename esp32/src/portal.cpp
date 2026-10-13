@@ -14,7 +14,7 @@ WiFiManager wm;
 WiFiManagerParameter paramHelp(
     "<p style='margin:8px 0'>Datos de tu servidor Home Calendar. El token se genera en "
     "<b>Administrar &gt; Pantalla ESP32</b>.</p>");
-WiFiManagerParameter paramServer("server", "URL del servidor (ej. http://192.168.1.50)", "", 120);
+WiFiManagerParameter paramServer("server", "URL del servidor (ej. http://homecalendar.local o http://192.168.1.14)", "", 120);
 WiFiManagerParameter paramToken("token", "Token del ESP32 (hc_...)", "", 80);
 
 bool configured = false;  // se configuró WiFiManager (callbacks, parámetros)

@@ -1,5 +1,6 @@
 #include "api.h"
 
+#include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -15,6 +16,52 @@ constexpr uint16_t kConnectTimeoutMs = 5000;
 constexpr uint16_t kReadTimeoutMs = 8000;
 // Respuesta máxima que se acepta (unas 60 tareas). Evita quedarse sin memoria.
 constexpr size_t kMaxBody = 24 * 1024;
+
+// ---------- Nombres .local (mDNS) ----------
+// HTTPClient solo resuelve DNS normal: "homecalendar.local" se resuelve aquí por mDNS
+// y la petición se hace a la IP. Se cachea un rato para no preguntar en cada refresco.
+constexpr uint32_t kMdnsCacheMs = 10 * 60 * 1000;
+constexpr uint32_t kMdnsTimeoutMs = 2500;
+bool mdnsStarted = false;
+std::string cachedHost;
+IPAddress cachedIp;
+uint32_t cachedAtMs = 0;
+
+/** IP de un nombre "algo.local", o INADDR_NONE si nadie responde. */
+IPAddress resolveMdns(const std::string& host) {
+  const uint32_t now = millis();
+  if (host == cachedHost && cachedIp != INADDR_NONE && now - cachedAtMs < kMdnsCacheMs) return cachedIp;
+  if (!mdnsStarted) mdnsStarted = MDNS.begin("homecalendar-display");
+  // queryHost recibe el nombre sin ".local"
+  const std::string name = host.substr(0, host.size() - 6);
+  IPAddress ip = MDNS.queryHost(name.c_str(), kMdnsTimeoutMs);
+  if (ip == IPAddress(0, 0, 0, 0)) ip = INADDR_NONE;
+  if (ip != INADDR_NONE) {
+    cachedHost = host;
+    cachedIp = ip;
+    cachedAtMs = now;
+    Serial.printf("mDNS: %s -> %s\n", host.c_str(), ip.toString().c_str());
+  }
+  return ip;
+}
+
+/** Si la URL usa un nombre .local, la devuelve con la IP resuelta. `error` se rellena si no se encuentra. */
+String resolveUrl(const String& url, String& error) {
+  agenda::Url parts;
+  if (!agenda::parseUrl(url.c_str(), parts) || !agenda::isMdnsHost(parts.host)) return url;
+  const IPAddress ip = resolveMdns(parts.host);
+  if (ip == INADDR_NONE) {
+    error = String("No se encuentra ") + parts.host.c_str();
+    return "";
+  }
+  return agenda::buildUrl(parts, ip.toString().c_str()).c_str();
+}
+
+/** Tras un fallo de red se olvida la IP: puede que la VM haya cambiado de dirección. */
+void forgetMdns() {
+  cachedHost.clear();
+  cachedIp = INADDR_NONE;
+}
 }  // namespace
 
 FetchResult fetchDay(const Settings& settings, const String& date, agenda::Day& out) {
@@ -26,7 +73,8 @@ FetchResult fetchDay(const Settings& settings, const String& date, agenda::Day& 
 
   // HTTPS opcional (p. ej. detrás de un proxy con certificado). No se valida el certificado:
   // es una red doméstica y el ESP32 no tiene dónde guardar la CA de forma práctica.
-  const String url = settings.endpoint(date);
+  const String url = resolveUrl(settings.endpoint(date), result.message);
+  if (url.isEmpty()) return result;  // nombre .local sin respuesta (NetworkError)
   std::unique_ptr<WiFiClient> client;
   if (url.startsWith("https://")) {
     auto* secure = new WiFiClientSecure();
@@ -51,6 +99,7 @@ FetchResult fetchDay(const Settings& settings, const String& date, agenda::Day& 
   result.httpCode = code;
   if (code <= 0) {
     result.message = HTTPClient::errorToString(code);
+    forgetMdns();
     http.end();
     return result;
   }

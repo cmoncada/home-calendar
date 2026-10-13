@@ -135,6 +135,32 @@ void test_hash_changes() {
   TEST_ASSERT_EQUAL(hash(a, 4), hash(a, 4));
 }
 
+void test_urls() {
+  Url u;
+  TEST_ASSERT_TRUE(parseUrl("http://homecalendar.local/api/display/today?date=2026-10-13", u));
+  TEST_ASSERT_EQUAL_STRING("http", u.scheme.c_str());
+  TEST_ASSERT_EQUAL_STRING("homecalendar.local", u.host.c_str());
+  TEST_ASSERT_EQUAL_STRING("", u.port.c_str());
+  TEST_ASSERT_EQUAL_STRING("/api/display/today?date=2026-10-13", u.path.c_str());
+  TEST_ASSERT_EQUAL_STRING("http://192.168.1.14/api/display/today?date=2026-10-13", buildUrl(u, "192.168.1.14").c_str());
+
+  TEST_ASSERT_TRUE(parseUrl("http://192.168.1.50:3000/api/display/today", u));
+  TEST_ASSERT_EQUAL_STRING("192.168.1.50", u.host.c_str());
+  TEST_ASSERT_EQUAL_STRING("3000", u.port.c_str());
+  TEST_ASSERT_EQUAL_STRING("http://192.168.1.50:3000/api/display/today", buildUrl(u).c_str());
+
+  TEST_ASSERT_TRUE(parseUrl("https://casa.local", u));
+  TEST_ASSERT_EQUAL_STRING("/", u.path.c_str());
+  TEST_ASSERT_FALSE(parseUrl("homecalendar.local/api", u));
+  TEST_ASSERT_FALSE(parseUrl("http:///api", u));
+
+  TEST_ASSERT_TRUE(isMdnsHost("homecalendar.local"));
+  TEST_ASSERT_TRUE(isMdnsHost("HomeCalendar.LOCAL"));
+  TEST_ASSERT_FALSE(isMdnsHost("192.168.1.14"));
+  TEST_ASSERT_FALSE(isMdnsHost(".local"));
+  TEST_ASSERT_FALSE(isMdnsHost("calendario.casa"));
+}
+
 int main() {
   UNITY_BEGIN();
   RUN_TEST(test_parse_mock);
@@ -146,5 +172,6 @@ int main() {
   RUN_TEST(test_dates);
   RUN_TEST(test_fit_text_utf8);
   RUN_TEST(test_hash_changes);
+  RUN_TEST(test_urls);
   return UNITY_END();
 }

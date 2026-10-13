@@ -65,4 +65,19 @@ std::string fitText(const std::string& text, int maxWidth, const std::function<i
 /** Hash FNV-1a: detecta si los datos cambiaron para no redibujar sin necesidad. */
 uint32_t hash(const char* data, size_t length, uint32_t seed = 2166136261u);
 
+// ---------- URLs ----------
+struct Url {
+  std::string scheme;  // "http" / "https"
+  std::string host;    // "homecalendar.local", "192.168.1.14"
+  std::string port;    // "" = el de por defecto
+  std::string path;    // "/api/display/today?date=…" (siempre empieza por "/")
+};
+
+/** Separa "http://host:puerto/ruta". Devuelve false si no tiene esquema o host. */
+bool parseUrl(const std::string& url, Url& out);
+/** Vuelve a montar la URL; `host` permite sustituir el nombre (p. ej. por la IP resuelta). */
+std::string buildUrl(const Url& url, const std::string& host = "");
+/** ¿Es un nombre mDNS ("algo.local")? El cliente HTTP del ESP32 no los resuelve solo. */
+bool isMdnsHost(const std::string& host);
+
 }  // namespace agenda
