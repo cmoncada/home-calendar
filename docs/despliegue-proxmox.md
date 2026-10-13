@@ -225,7 +225,7 @@ Qué hace:
 - **Compatibilidad:**
   - funciona en Mac, iPhone, iPad y Windows 10/11;
   - en Android depende de la versión y del navegador: si no abre, usa la IP;
-  - **el ESP32 debe seguir usando la IP** (su cliente HTTP no resuelve nombres `.local`).
+  - el ESP32 también acepta la dirección `.local` en su portal (la resuelve por mDNS); la IP sigue funcionando.
 - **Comprobarlo** desde el Mac: `ping -c 1 home-calendar.local`.
 - **Si ya instalaste la PWA con la IP**, bórrala y vuelve a añadirla desde la dirección `.local`: la sesión va ligada a la dirección.
 

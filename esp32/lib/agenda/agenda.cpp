@@ -214,4 +214,44 @@ uint32_t hash(const char* data, size_t length, uint32_t seed) {
   return h;
 }
 
+bool parseUrl(const std::string& url, Url& out) {
+  const size_t sep = url.find("://");
+  if (sep == std::string::npos || sep == 0) return false;
+  Url u;
+  u.scheme = url.substr(0, sep);
+  const size_t hostStart = sep + 3;
+  size_t pathStart = url.find_first_of("/?", hostStart);
+  if (pathStart == std::string::npos) pathStart = url.size();
+  const std::string authority = url.substr(hostStart, pathStart - hostStart);
+  const size_t colon = authority.rfind(':');
+  if (colon != std::string::npos) {
+    u.host = authority.substr(0, colon);
+    u.port = authority.substr(colon + 1);
+  } else {
+    u.host = authority;
+  }
+  if (u.host.empty()) return false;
+  u.path = url.substr(pathStart);
+  if (u.path.empty() || u.path[0] != '/') u.path = "/" + u.path;
+  out = std::move(u);
+  return true;
+}
+
+std::string buildUrl(const Url& url, const std::string& host) {
+  std::string out = url.scheme + "://" + (host.empty() ? url.host : host);
+  if (!url.port.empty()) out += ":" + url.port;
+  return out + url.path;
+}
+
+bool isMdnsHost(const std::string& host) {
+  static const std::string kSuffix = ".local";
+  if (host.size() <= kSuffix.size()) return false;
+  for (size_t i = 0; i < kSuffix.size(); i++) {
+    char c = host[host.size() - kSuffix.size() + i];
+    if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
+    if (c != kSuffix[i]) return false;
+  }
+  return true;
+}
+
 }  // namespace agenda

@@ -60,12 +60,18 @@ La primera compilación descarga el compilador y las librerías (unos minutos).
 3. **Conéctate desde el móvil** a la WiFi **`HomeCalendar-Setup`** (contraseña **`calendario`**). Se abre una página de configuración; si no, entra en **http://192.168.4.1**.
 4. **Pulsa "Configure WiFi"**, elige tu red, escribe su contraseña y rellena:
    - **URL del servidor**:
-     - producción: `http://IP-DE-LA-VM` (el puerto 80 de Nginx);
+     - producción: `http://homecalendar.local` (el nombre mDNS de la VM, ver la guía de Proxmox) o `http://IP-DE-LA-VM` (el puerto 80 de Nginx);
      - desarrollo en el Mac: `http://IP-DEL-MAC:3000`.
    - **Token**: `hc_…`.
 5. **Guarda.** La placa se conecta y muestra las tareas.
 
 La URL se normaliza sola: puedes pegar `192.168.1.50`, `http://192.168.1.50/` o incluso la URL completa del endpoint.
+
+**Nombres `.local`.** El cliente HTTP del ESP32 no entiende nombres mDNS por sí solo, así que el firmware los resuelve antes de cada petición:
+- guarda la IP 10 minutos;
+- si la conexión falla, la vuelve a preguntar, por si la VM cambió de dirección.
+
+Si nadie responde a ese nombre, el pie muestra "No se encuentra homecalendar.local". En ese caso, comprueba desde el Mac con `dscacheutil -q host -a name homecalendar.local` que el nombre resuelve a la IP de la VM en tu red.
 
 **Cambiar la configuración más tarde:**
 - **Mantén pulsado BOOT 3 s** (con la pantalla funcionando): se abre el portal con los valores actuales ya rellenados.
@@ -194,6 +200,7 @@ Cuando funcione, cambia la URL a la de la VM de producción (BOOT 3 s) y usa un 
 | Pantalla en blanco | Algunas placas necesitan otro driver: en `env:cyd` cambia `-DILI9341_2_DRIVER` por `-DILI9341_DRIVER`. |
 | No aparece el puerto al subir | Prueba otro cable (de datos) o puerto. Mantén BOOT pulsado al empezar la subida si se queda en "Connecting…". |
 | "Token no válido" | El token se revocó o es de otro servidor (dev o prod). Genera uno nuevo y cámbialo con BOOT 3 s. |
+| "No se encuentra NOMBRE.local" | La VM no responde por mDNS. Comprueba que `avahi-daemon` está activo en la VM y que el nombre resuelve a la IP de tu red (no a una `172.x` de Docker). Mientras tanto, puedes usar la IP. |
 | "Sin conexión" | Comprueba la URL con curl desde otro equipo de la misma red. En dev, el puerto es `:3000`; en producción, `:80`. |
 | No veo tareas privadas | Es intencionado: la pantalla nunca muestra tareas privadas. |
 
