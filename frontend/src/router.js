@@ -11,11 +11,14 @@ const router = createRouter({
     { path: '/profile', name: 'settings', component: () => import('./views/ProfileSettingsView.vue') },
     { path: '/admin/dashboard', name: 'dashboard', component: () => import('./views/DashboardView.vue'), meta: { admin: true } },
     { path: '/admin', name: 'admin', component: () => import('./views/AdminView.vue'), meta: { admin: true } },
+    // Pantalla de televisor: sin sesión, se identifica con un token de pantalla (?token=)
+    { path: '/tv', name: 'tv', component: () => import('./views/TvView.vue'), meta: { public: true } },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 });
 
 router.beforeEach(async (to) => {
+  if (to.meta.public) return true;
   const auth = useAuthStore();
   if (!auth.checked) await auth.fetchMe();
 

@@ -90,6 +90,7 @@ async function copy(text) {
 
 const fmtDate = (s) => (s ? new Date(s.replace(' ', 'T') + 'Z').toLocaleString('es') : '—');
 const endpoint = `${location.origin}/api/display/today`;
+const tvUrl = (token) => `${location.origin}/tv?token=${token}`;
 
 onMounted(() => load().catch((err) => (error.value = err.message)));
 </script>
@@ -164,11 +165,12 @@ onMounted(() => load().catch((err) => (error.value = err.message)));
 
     <section class="card">
       <div class="section-head">
-        <h2>Pantalla ESP32</h2>
+        <h2>Pantallas (ESP32 y TV)</h2>
       </div>
       <p class="muted small">
-        El dispositivo consulta <code>GET {{ endpoint }}</code> con la cabecera
+        El ESP32 consulta <code>GET {{ endpoint }}</code> con la cabecera
         <code>Authorization: Bearer &lt;token&gt;</code> y recibe un JSON compacto con las tareas del día.
+        Un televisor abre <code>{{ tvUrl('&lt;token&gt;') }}</code> en su navegador (solo lectura, sin tareas privadas).
       </p>
 
       <form class="token-form" @submit.prevent="createToken">
@@ -183,6 +185,11 @@ onMounted(() => load().catch((err) => (error.value = err.message)));
           <button class="btn btn-ghost" type="button" @click="copy(newToken.token)">Copiar</button>
         </div>
         <pre class="curl">curl -H "Authorization: Bearer {{ newToken.token }}" {{ endpoint }}</pre>
+        <p class="muted small">Para un televisor, abre en su navegador:</p>
+        <div class="token-box">
+          <code>{{ tvUrl(newToken.token) }}</code>
+          <button class="btn btn-ghost" type="button" @click="copy(tvUrl(newToken.token))">Copiar</button>
+        </div>
       </div>
 
       <div class="table-wrap">
