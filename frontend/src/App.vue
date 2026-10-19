@@ -6,7 +6,7 @@ import { useAuthStore } from './stores/auth.js';
 
 const route = useRoute();
 const auth = useAuthStore();
-const showHeader = computed(() => route.name && !route.meta.guest && auth.user);
+const showHeader = computed(() => route.name && !route.meta.guest && !route.meta.public && auth.user);
 </script>
 
 <template>

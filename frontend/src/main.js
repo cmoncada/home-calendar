@@ -1,3 +1,4 @@
+import './polyfills.js'; // primero: antes de que se evalúe nada que los use
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
